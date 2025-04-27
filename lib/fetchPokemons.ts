@@ -1,42 +1,19 @@
-export interface PokemonListResult {
-  name: string;
-  url: string;
-}
+import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
 
-export interface PokemonListResponse {
-  results: PokemonListResult[];
-  next: string | null;
-}
-
-export interface PokemonDetail {
-  id: number;
-  name: string;
-  sprites: {
-    front_default: string;
-  };
-}
+const pokemonApi = new PokemonClient();
 
 export async function fetchPokemons(
   limit = 20,
   offset = 0
-): Promise<PokemonListResponse> {
-  const res = await fetch(
-    `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
-  );
+): Promise<NamedAPIResource[]> {
+  const response = await pokemonApi.listPokemonForms(offset, limit);
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch Pokémon list");
-  }
-
-  return res.json();
+  return response.results;
 }
 
-export async function fetchPokemonDetail(url: string): Promise<PokemonDetail> {
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch Pokémon detail");
-  }
-
-  return res.json();
+export async function fetchPokemonByName(name: string): Promise<Pokemon> {
+  const response = await pokemonApi.getPokemonByName(
+    `${name.toLowerCase().trim()}`
+  );
+  return response;
 }

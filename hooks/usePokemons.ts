@@ -1,17 +1,14 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchPokemons } from "@/lib/fetchPokemons";
+import { NamedAPIResource } from "pokenode-ts";
 
-export const usePokemons = () => {
-  return useInfiniteQuery({
-    queryKey: ["pokemons"],
-    queryFn: ({ pageParam = 0 }) => fetchPokemons(20, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage.next) return undefined;
-      return allPages.length * 20;
-    },
+export function usePokemons() {
+  return useQuery<NamedAPIResource[], Error>({
+    queryKey: ["pokemon-names"],
+    queryFn: () => fetchPokemons(100000, 0),
+    staleTime: Infinity, // cache forever
     retry: false,
   });
-};
+}
