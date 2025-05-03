@@ -6,7 +6,7 @@ export async function fetchPokemons(
   limit = 20,
   offset = 0
 ): Promise<NamedAPIResource[]> {
-  const response = await pokemonApi.listPokemonForms(offset, limit);
+  const response = await pokemonApi.listPokemons(offset, limit);
 
   return response.results;
 }
