@@ -2,12 +2,17 @@
 
 import Image from "next/image";
 
+import { usePokemonForm } from "@/hooks/usePokemonForm";
+
 interface PokemonCardProps {
   name: string;
   imageUrl: string;
+  id: number;
 }
 
-export default function PokemonCard({ name, imageUrl }: PokemonCardProps) {
+export default function PokemonCard({ name, imageUrl, id }: PokemonCardProps) {
+  const { data: pokemonForm, isLoading } = usePokemonForm(id);
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="relative w-full h-64">
