@@ -44,6 +44,28 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+@theme {
+  /* Define your Pokémon colors as CSS Custom Properties */
+  --color-pokemon-normal: #a8a77a;
+  --color-pokemon-fire: #ee8130;
+  --color-pokemon-water: #6390f0;
+  --color-pokemon-electric: #f7d02c;
+  --color-pokemon-grass: #7ac74c;
+  --color-pokemon-ice: #96d9d6;
+  --color-pokemon-fighting: #c22e28;
+  --color-pokemon-poison: #a33ea1;
+  --color-pokemon-ground: #e2bf65;
+  --color-pokemon-flying: #a98ff3;
+  --color-pokemon-psychic: #f95587;
+  --color-pokemon-bug: #a6b91a;
+  --color-pokemon-rock: #b6a136;
+  --color-pokemon-ghost: #735797;
+  --color-pokemon-dragon: #6f35fc;
+  --color-pokemon-dark: #705746;
+  --color-pokemon-steel: #b7b7ce;
+  --color-pokemon-fairy: #d685ad;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
