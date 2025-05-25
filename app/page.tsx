@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import PokemonCard from "@/components/PokemonCard";
-import { getOfficialArtwork } from "@/utils";
+import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
 import { usePokemons } from "@/hooks/usePokemons";
 import { NamedAPIResource } from "pokenode-ts";
 import { DATA_PER_PAGE } from "@/constants";
@@ -98,6 +98,7 @@ export default function Home() {
                 key={`${pokemon.name}-${index}`}
                 name={pokemon.name}
                 imageUrl={getOfficialArtwork(pokemon.url)}
+                id={getPokemonIdFromPokemonUrl(pokemon.url)}
               />
             ))}
           </div>
