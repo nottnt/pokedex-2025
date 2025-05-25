@@ -14,14 +14,16 @@ interface PokemonCardProps {
 }
 
 interface PokemonTypeBadgeProps {
+  id: number;
   pokemonTypes?: PokemonType[];
 }
 
-const PokemonTypeBadge = ({ pokemonTypes }: PokemonTypeBadgeProps) => {
+const PokemonTypeBadge = ({ id, pokemonTypes }: PokemonTypeBadgeProps) => {
   return (
     <div className="p-2 text-center">
       {pokemonTypes?.map((pokemonType: PokemonType) => (
         <Badge
+          key={`${id}-${pokemonType.type.name}`}
           variant={pokemonType.type.name as PokemonTypeName}
           className="m-1"
         >
@@ -49,7 +51,7 @@ export default function PokemonCard({ name, imageUrl, id }: PokemonCardProps) {
       <div className="p-2 text-center">
         <h2 className="text-xl font-bold capitalize">{name}</h2>
       </div>
-      <PokemonTypeBadge pokemonTypes={pokemonForm?.types} />
+      <PokemonTypeBadge pokemonTypes={pokemonForm?.types} id={id} />
     </div>
   );
 }

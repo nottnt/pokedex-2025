@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "lucide-react";
-import { LoginDialog } from "./LoginDialog";
+import { AuthDialog } from "./AuthDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -19,7 +19,7 @@ export function Navbar() {
               <User className="h-5 w-5" />
             </Button>
           </DialogTrigger>
-          <LoginDialog />
+          {open && <AuthDialog />}
         </Dialog>
       </div>
     </nav>
