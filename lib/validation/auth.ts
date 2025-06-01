@@ -20,3 +20,11 @@ export const signUpSchema = z
     path: ["confirmPassword"], // Set the error on the confirmPassword field
   });
 export type SignUpInput = z.infer<typeof signUpSchema>;
+
+export const requestVerificationEmailSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }),
+});
+
+export type RequestVerificationEmailInput = z.infer<
+  typeof requestVerificationEmailSchema
+>;
