@@ -14,7 +14,7 @@ export async function sendVerificationEmail(email: string, token: string) {
     throw new Error("Email configuration error: App URL is missing.");
   }
 
-  const verificationLink = `<span class="math-inline">\{appUrl\}/api/auth/verify\-email?token\=</span>{token}`; // Ensure this verify-email route is also an App Router route if it's not already
+  const verificationLink = `<span class="math-inline">${appUrl}/api/auth/verify-email?token=</span>${token}`; // Ensure this verify-email route is also an App Router route if it's not already
 
   try {
     const { data }: CreateEmailResponse = await resend.emails.send({
