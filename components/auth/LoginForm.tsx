@@ -12,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
+import { PasswordVisibilityToggle } from "@/components/compositions/PasswordVisibilityToggle";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -28,6 +28,7 @@ export function LoginForm({
   onLoginSuccess,
   onSwitchToSignUp,
 }: LoginFormProps) {
+  const [showPassword, setShowPassword] = React.useState(false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -90,10 +91,18 @@ export function LoginForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
-              <FormMessage />
+              <div className="relative">
+                <FormControl>
+                  <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormMessage />
+                <PasswordVisibilityToggle
+                  show={showPassword}
+                  onToggle={() => setShowPassword((prev) => !prev)}
+                  disabled={loginMutation.isPending}
+                  ariaLabelBase="confirm password"
+                />
+              </div>
             </FormItem>
           )}
         />
