@@ -20,15 +20,15 @@ export async function sendVerificationEmail(email: string, token: string) {
     const { data }: CreateEmailResponse = await resend.emails.send({
       from: fromEmail,
       to: email,
-      subject: "Verify Your Email Address for MyApp", // Customize
+      subject: "Verify Your Email Address for Pokédex-2025 ",
       html: `
-        <h1>Welcome to MyApp!</h1>
+        <h1>Welcome to Pokédex-2025 !</h1>
         <p>Thanks for signing up. Please verify your email address by clicking the link below:</p>
         <a href="${verificationLink}">Verify Email</a>
         <p>This link will expire in 1 hour.</p>
-        <p>If you did not sign up for MyApp, please ignore this email.</p>
+        <p>If you did not sign up for Pokédex-2025 , please ignore this email.</p>
       `,
-      // text: `Welcome to MyApp! ... ${verificationLink} ...`, // Optional plain text version
+      // text: `Welcome to Pokédex-2025 ! ... ${verificationLink} ...`, // Optional plain text version
     });
     console.log("Verification email sent successfully:", data?.id);
     return data;
