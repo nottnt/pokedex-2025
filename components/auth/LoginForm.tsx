@@ -95,7 +95,6 @@ export function LoginForm({
                 <FormControl>
                   <Input type="password" placeholder="••••••••" {...field} />
                 </FormControl>
-                <FormMessage />
                 <PasswordVisibilityToggle
                   show={showPassword}
                   onToggle={() => setShowPassword((prev) => !prev)}
@@ -103,6 +102,7 @@ export function LoginForm({
                   ariaLabelBase="confirm password"
                 />
               </div>
+              <FormMessage />
             </FormItem>
           )}
         />
