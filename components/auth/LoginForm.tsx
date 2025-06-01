@@ -93,7 +93,11 @@ export function LoginForm({
               <FormLabel>Password</FormLabel>
               <div className="relative">
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...field}
+                  />
                 </FormControl>
                 <PasswordVisibilityToggle
                   show={showPassword}
