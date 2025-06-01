@@ -22,17 +22,21 @@ import { useMutation } from "@tanstack/react-query";
 interface LoginFormProps {
   onLoginSuccess: () => void;
   onSwitchToSignUp: () => void;
+  onRequestVerificationNeeded: (email: string) => void;
+  initialEmail?: string;
 }
 
 export function LoginForm({
   onLoginSuccess,
   onSwitchToSignUp,
+  onRequestVerificationNeeded,
+  initialEmail,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = React.useState(false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      email: initialEmail,
       password: "",
     },
   });
@@ -45,12 +49,26 @@ export function LoginForm({
         redirect: false,
       });
 
-      if (!res?.ok) {
-        form.setError("root.serverError", {
-          type: "manual",
-          message: "Invalid email or password. Please try again.",
-        });
-        throw new Error("Invalid credentials");
+      if (res && !res.ok) {
+        // res.error will contain the string of the error thrown in authorize
+        const errorMessage = res.error || "Invalid credentials"; // Default message
+
+        // Check for your specific "Email not verified" error
+        if (errorMessage.includes("Email not verified")) {
+          form.setError("root.serverError", {
+            // Or a specific field if you prefer
+            type: "manual",
+            message: errorMessage, // Display the exact message from authorize
+          });
+          // This is where you call the prop to switch AuthDialog mode
+          onRequestVerificationNeeded(data.email);
+        } else {
+          form.setError("root.serverError", {
+            type: "manual",
+            message: "Invalid email or password. Please try again.", // Generic for other errors
+          });
+        }
+        throw new Error(errorMessage); // Throw to trigger useMutation's onError
       }
       return res;
     },
@@ -131,17 +149,6 @@ export function LoginForm({
           </Button>
         </div>
       </form>
-      <div className="mt-4 text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <Button
-          variant="link"
-          className="p-0 h-auto font-semibold"
-          onClick={onSwitchToSignUp}
-          disabled={loginMutation.isPending}
-        >
-          Sign Up
-        </Button>
-      </div>
     </Form>
   );
 }
