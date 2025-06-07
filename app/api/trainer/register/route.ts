@@ -1,6 +1,6 @@
 import { connectToDB } from "@/lib/mongodb";
 import { Trainer } from "@/lib/models/Trainer";
-import { TrainerFormData, trainerSchema } from "@/lib/validation/trainerSchema";
+import { TrainerFormData, trainerSchema } from "@/lib/validation/trainer";
 
 export async function POST(req: Request) {
   try {

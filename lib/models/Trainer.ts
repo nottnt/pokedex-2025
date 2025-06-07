@@ -1,5 +1,5 @@
 import { Schema, model, models, Document, Model } from "mongoose";
-import { TrainerFormData } from "../validation/trainerSchema";
+import { TrainerFormData } from "../validation/trainer";
 
 // 1. Define the interface for TypeScript
 export interface ITrainer extends Document, TrainerFormData {}

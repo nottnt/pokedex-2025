@@ -3,7 +3,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { trainerSchema, TrainerFormData } from "@/lib/validation/trainerSchema";
+import { trainerSchema, TrainerFormData } from "@/lib/validation/trainer";
 import { useMutation } from "@tanstack/react-query";
 import {
   Form,
