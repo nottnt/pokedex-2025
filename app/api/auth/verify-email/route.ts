@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import User from "@/lib/models/User";
+import Trainer from "@/lib/models/Trainer";
 
 export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -34,7 +35,23 @@ export async function GET(req: NextRequest) {
     user.verificationTokenExpires = null;
     await user.save();
 
-    // MODIFIED: Redirect to the root page with a query parameter
+    const trainer = await Trainer.findOne({
+      userId: user._id,
+    });
+
+    if (!trainer) {
+      const newTrainer = new Trainer({
+        userId: user._id,
+        name: user.email.split("@")[0], // Default name based on email
+        createdAt: new Date(),
+      });
+      const trainer = await newTrainer.save();
+
+      return NextResponse.redirect(new URL(`/trainer/${trainer._id}`, appUrl), {
+        status: 302,
+      });
+    }
+
     return NextResponse.redirect(new URL("/?verified=true", appUrl), {
       status: 302,
     });
