@@ -4,15 +4,12 @@ import crypto from "crypto";
 import { connectToDB } from "@/lib/mongodb";
 import User from "@/lib/models/User";
 import { sendVerificationEmail } from "@/lib/resend"; // Using your Resend email function
-
-const ResendVerificationSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-});
+import { requestVerificationEmailSchema } from "@/lib/validation/auth";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const validationResult = ResendVerificationSchema.safeParse(body);
+    const validationResult = requestVerificationEmailSchema.safeParse(body);
 
     if (!validationResult.success) {
       return NextResponse.json(
