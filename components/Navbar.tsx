@@ -23,7 +23,7 @@ export function Navbar() {
   const { data: session, status } = useSession();
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
   const router = useRouter();
-  console.log("Session in Navbar:", session?.user);
+
   return (
     <nav className="fixed top-0 left-0 w-full bg-white border-b z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
