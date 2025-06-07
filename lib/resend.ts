@@ -3,6 +3,7 @@ import { CreateEmailResponse, Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = process.env.EMAIL_FROM;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+const supportEmail = process.env.SUPPORT_EMAIL || "";
 
 export async function sendVerificationEmail(email: string, token: string) {
   if (!fromEmail) {
@@ -14,7 +15,7 @@ export async function sendVerificationEmail(email: string, token: string) {
     throw new Error("Email configuration error: App URL is missing.");
   }
 
-  const verificationLink = `<span class="math-inline">${appUrl}/api/auth/verify-email?token=</span>${token}`; // Ensure this verify-email route is also an App Router route if it's not already
+  const verificationLink = `${appUrl}/api/auth/verify-email?token=${token}`;
 
   try {
     const { data }: CreateEmailResponse = await resend.emails.send({
@@ -22,13 +23,16 @@ export async function sendVerificationEmail(email: string, token: string) {
       to: email,
       subject: "Verify Your Email Address for Pokédex-2025 ",
       html: `
-        <h1>Welcome to Pokédex-2025 !</h1>
-        <p>Thanks for signing up. Please verify your email address by clicking the link below:</p>
-        <a href="${verificationLink}">Verify Email</a>
+        <h1>Welcome to Pokédex-2025!</h1>
+        <p>Thanks for signing up. Please verify your email address by clicking the button below:</p>
+        <a href="${verificationLink}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Verify Email</a>
         <p>This link will expire in 1 hour.</p>
-        <p>If you did not sign up for Pokédex-2025 , please ignore this email.</p>
+        <p>If the button above doesn't work, copy and paste the following link into your browser:</p>
+        <p>${verificationLink}</p>
+        <p>If you did not sign up for Pokédex-2025, please ignore this email.</p>
+        <hr>
+        <p>If you have any questions, please contact our support team at ${supportEmail}.</p>
       `,
-      // text: `Welcome to Pokédex-2025 ! ... ${verificationLink} ...`, // Optional plain text version
     });
     console.log("Verification email sent successfully:", data?.id);
     return data;
