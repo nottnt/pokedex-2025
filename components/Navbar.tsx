@@ -56,7 +56,11 @@ export function Navbar() {
                 <p className="font-medium truncate">{session.user?.email}</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => router.push("/trainer")}>
+              <DropdownMenuItem
+                onSelect={() =>
+                  router.push(`/trainer/${session.user?.trainer?._id ?? ""}`)
+                }
+              >
                 Profile
               </DropdownMenuItem>
               <DropdownMenuSeparator />

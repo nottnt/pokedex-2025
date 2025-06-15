@@ -39,7 +39,7 @@ export const authOptions: AuthOptions = {
           // 3. User lookup
           const user = await User.findOne({
             email: credentials.email.toLowerCase(),
-          });
+          }).populate("trainer");
 
           // 4. User existence and password field check
           if (!user) {
@@ -92,6 +92,7 @@ export const authOptions: AuthOptions = {
             // name: user.name, // If you have a name field
             image: user.image, // If you have an image field
             // Add any other user properties you want in the token/session
+            trainer: user.trainer,
           };
         } catch (error: any) {
           // Log the error that occurred in the try block OR the error thrown by us (e.g., Email not verified)
@@ -126,13 +127,14 @@ export const authOptions: AuthOptions = {
       // `user` is available on initial sign-in
       if (user) {
         token.id = user.id; // id comes from what `authorize` or OAuth profile returns
-        // token.emailVerified = user.emailVerified // If you want to pass this to session (User model needs to be extended in next-auth.d.ts)
+        token.trainer = user.trainer;
       }
       return token;
     },
     async session({ session, token }) {
       if (token.id && session.user) {
         session.user.id = token.id as string;
+        session.user.trainer = token.trainer;
       }
       // if (token.emailVerified !== undefined && session.user) {
       //   (session.user as any).emailVerified = token.emailVerified; // Requires extending Session type
