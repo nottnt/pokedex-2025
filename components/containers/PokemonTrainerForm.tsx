@@ -29,7 +29,7 @@ export default function PokemonTrainerForm() {
       name: "",
       age: "",
       region: "",
-      email: session?.user?.email,
+      email: "",
     },
   });
 
