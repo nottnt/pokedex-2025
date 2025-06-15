@@ -1,5 +1,6 @@
 // lib/mongodb.ts
 import mongoose from "mongoose";
+import "./models";
 
 export async function connectToDB() {
   if (mongoose.connection.readyState >= 1) return;

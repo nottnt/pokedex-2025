@@ -1,10 +1,10 @@
-// src/lib/authOptions.ts  (or your chosen path)
+// src/lib/authOptions.ts
 
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import { connectToDB } from "@/lib/mongodb"; // Assuming this path is correct relative to your project root
-import User from "@/lib/models/User"; // Assuming this path is correct
+import { connectToDB } from "@/lib/mongodb";
+import User from "@/lib/models/User"; // Your Mongoose User model
 import { AuthOptions } from "next-auth";
 
 export const authOptions: AuthOptions = {
@@ -12,6 +12,10 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      // Optional: If you want to handle email verification for Google sign-in too,
+      // you might need to check the `email_verified` property in the profile
+      // and potentially link/update your User model accordingly in a `signIn` callback.
+      // For now, focusing on CredentialsProvider.
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -20,88 +24,127 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("Authorize: Attempting to authorize credentials user");
         try {
           // 1. Credentials check
           if (!credentials?.email || !credentials.password) {
             console.log("Authorize: Missing email or password");
+            // throw new Error("Please provide both email and password."); // Or return null
             return null;
           }
 
           // 2. Database connection
-          console.log("Authorize: Attempting to connect to DB");
           await connectToDB();
-          console.log("Authorize: Connected to DB");
 
           // 3. User lookup
-          console.log(`Authorize: Looking up user: ${credentials.email}`);
-          const user = await User.findOne({ email: credentials.email });
+          const user = await User.findOne({
+            email: credentials.email.toLowerCase(),
+          }).populate("trainer");
 
           // 4. User existence and password field check
           if (!user) {
-            console.log("Authorize: User not found");
+            console.log(
+              "Authorize: User not found for email:",
+              credentials.email
+            );
+            // throw new Error("Invalid credentials."); // Or return null
             return null;
           }
-          if (!user.password) {
+          if (!user.passwordHash) {
             console.log(
-              "Authorize: User found, but no password stored for this user."
+              "Authorize: User found, but no password stored (e.g., OAuth user)."
             );
-            return null;
-          }
-          console.log("Authorize: User found, password field exists.");
-
-          // 5. Password comparison
-          console.log("Authorize: Comparing passwords");
-          const isValid = await compare(credentials.password, user.password);
-          if (!isValid) {
-            console.log(
-              "Authorize: Password comparison failed (invalid password)"
-            );
+            // throw new Error("This account does not use password login."); // Or return null
             return null;
           }
 
-          console.log("Authorize: Password valid, returning user object");
-          // 6. Successful authorization
+          // 5. Password comparison
+          const isValidPassword = await compare(
+            credentials.password,
+            user.passwordHash
+          );
+
+          if (!isValidPassword) {
+            console.log("Authorize: Invalid password for user:", user.email);
+            // throw new Error("Invalid credentials."); // Or return null
+            return null;
+          }
+
+          // 6. <<<--- EMAIL VERIFICATION CHECK ---<<<
+          if (!user.emailVerified) {
+            console.log("Authorize: Email not verified for user:", user.email);
+            // Throwing a specific error message is good for client-side handling
+            throw new Error(
+              "Email not verified. Please check your inbox or request a new verification email."
+            );
+          }
+          // If you prefer a shorter error code to check on client:
+          // throw new Error("EMAIL_NOT_VERIFIED");
+
+          console.log(
+            "Authorize: Credentials valid and email verified for user:",
+            user.email
+          );
+          // 7. Successful authorization
           return {
-            id: user._id.toString(),
+            id: (user._id as string).toString(),
             email: user.email,
-            name: user.name,
-            image: user.image,
+            // name: user.name, // If you have a name field
+            image: user.image, // If you have an image field
+            // Add any other user properties you want in the token/session
+            trainer: user.trainer,
           };
         } catch (error: any) {
-          console.error(
-            `Authorize error in catch block: ${error.message}`,
-            error
-          ); // Enhanced error logging
-          return null; // Explicitly return null on any caught error
+          // Log the error that occurred in the try block OR the error thrown by us (e.g., Email not verified)
+          console.error(`Authorize error: ${error.message}`);
+          // Re-throw the error so NextAuth can handle it (or it bubbles up to signIn call)
+          throw error; // Or throw new Error(error.message) if you want to ensure it's an Error instance
         }
       },
     }),
   ],
   pages: {
-    signIn: "/", // We'll discuss this for App Router below
+    // For App Router, signIn page is typically handled by your root page or a specific route
+    // If you want to redirect to a custom page on error, you can use query params.
+    // Example: signIn: '/auth/signin', // or just '/' if your dialog is there
+    // error: '/auth/error' // A page to handle general auth errors
+    signIn: "/", // Since your login is a dialog on the root page
   },
   callbacks: {
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-    // OPTIONAL: If you want to add more to the JWT token itself (e.g., name, email, custom roles)
-    // which then gets passed to the session callback, you might also need a jwt callback:
-    /*
+    // async signIn({ user, account, profile, email, credentials }) {
+    //   // This callback is called on successful signin AFTER authorize.
+    //   // For Credentials, if authorize throws, this won't be hit.
+    //   // For OAuth, this is where you might check profile.email_verified
+    //   // and if false, prevent sign-in or flag the account.
+    //   if (account?.provider === "google" && profile && !profile.email_verified) {
+    //      console.log("Google sign-in attempt with unverified email:", profile.email);
+    //      // return false; // To deny access
+    //      // Or redirect to a specific page: return '/auth/verify-oauth-email-notice';
+    //   }
+    //   return true; // Allow sign in
+    // },
     async jwt({ token, user }) {
+      // `user` is available on initial sign-in
       if (user) {
-        token.id = user.id; // user.id comes from the 'id' you returned in 'authorize'
-        // token.name = user.name; // if you want name directly in token
-        // token.email = user.email; // if you want email directly in token
+        token.id = user.id; // id comes from what `authorize` or OAuth profile returns
+        token.trainer = user.trainer;
       }
       return token;
     },
-    */
+    async session({ session, token }) {
+      if (token.id && session.user) {
+        session.user.id = token.id as string;
+        session.user.trainer = token.trainer;
+      }
+      // if (token.emailVerified !== undefined && session.user) {
+      //   (session.user as any).emailVerified = token.emailVerified; // Requires extending Session type
+      // }
+      return session;
+    },
   },
   session: {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  // Optional: debug: process.env.NODE_ENV === 'development', // For more logs from NextAuth
 };

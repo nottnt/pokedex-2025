@@ -1,9 +1,12 @@
 // app/page.tsx
 "use client";
 
+import React from "react";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { trainerSchema, TrainerFormData } from "@/lib/validation/trainerSchema";
+import { toast } from "sonner";
+import { trainerSchema, TrainerFormData } from "@/lib/validation/trainer";
 import { useMutation } from "@tanstack/react-query";
 import {
   Form,
@@ -15,24 +18,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import useTrainer from "@/hooks/useTrainer";
 
 export default function PokemonTrainerForm() {
-  const [serverError, setServerError] = useState("");
+  const params = useParams();
+  const trainerId = params.id?.[0];
+  const { trainerData, isLoading, isError } = useTrainer(trainerId);
 
   const form = useForm<TrainerFormData>({
     resolver: zodResolver(trainerSchema),
     defaultValues: {
       name: "",
-      age: 10,
+      age: "",
       region: "",
-      email: "",
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: TrainerFormData) => {
-      const res = await fetch("/api/trainer/register", {
+      const res = await fetch("/api/trainer/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -40,24 +44,35 @@ export default function PokemonTrainerForm() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || "Registration failed");
+        throw new Error(error.error || "Update failed");
       }
+
+      toast.success("Successful!", {
+        description: "Trainer information updated successfully!",
+      });
 
       return res.json();
     },
     onError: (err: any) => {
-      setServerError(err.message);
+      toast.error("Update Failed!", {
+        description: err.message,
+      });
     },
   });
 
   const onSubmit = (data: TrainerFormData) => {
-    setServerError("");
     mutation.mutate(data);
   };
 
+  React.useEffect(() => {
+    if (trainerId && trainerData) {
+      form.reset(trainerData);
+    }
+  }, [trainerData, trainerId]);
+
   return (
     <main className="p-8 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Pokemon Trainer Registration</h1>
+      <h1 className="text-2xl font-bold mb-6">Pokemon Trainer Profile</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -67,7 +82,7 @@ export default function PokemonTrainerForm() {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ash Ketchum" {...field} />
+                  <Input placeholder="Satoshi" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,7 +95,7 @@ export default function PokemonTrainerForm() {
               <FormItem>
                 <FormLabel>Age</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} />
+                  <Input type="number" placeholder="10" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -99,35 +114,12 @@ export default function PokemonTrainerForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="ash@pokemon.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {serverError && <p className="text-red-600">{serverError}</p>}
 
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Submitting..." : "Register"}
+            {mutation.isPending ? "Submitting..." : "Save"}
           </Button>
         </form>
       </Form>
-
-      {mutation.isSuccess && (
-        <p className="mt-4 text-green-600">Trainer registered successfully!</p>
-      )}
     </main>
   );
 }
