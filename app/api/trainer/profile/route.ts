@@ -43,8 +43,9 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // 1. Authentication Check - No changes here
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
       return NextResponse.json(
@@ -58,41 +59,32 @@ export async function POST(req: Request) {
     const userIdString = session.user.id;
     const userIdObject = new mongoose.Types.ObjectId(userIdString);
 
-    // 5. Prevent duplicate profiles
-    const existingTrainer = await Trainer.findOne({ userId: userIdObject });
-    if (existingTrainer) {
-      return NextResponse.json(
-        { message: "Trainer profile already exists for this user." },
-        { status: 409 } // 409 Conflict
-      );
-    }
-
-    // 6. Get and validate the form data from the client
     const body: TrainerFormData = await req.json();
     const formData = trainerSchema.parse(body);
 
-    // 7. Create the new trainer with the secure userId and client form data
-    const newTrainer = new Trainer({
-      ...formData,
-      userId: userIdObject,
-    });
-    await newTrainer.save();
+    const updatedOrCreatedTrainer = await Trainer.findOneAndUpdate(
+      { userId: userIdObject },
+      { $set: formData },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
 
-    // 8. CRITICAL: Update the User document to establish the link
     await User.findByIdAndUpdate(userIdObject, {
-      $set: { trainer: newTrainer._id },
+      $set: { trainer: updatedOrCreatedTrainer._id },
     });
 
-    return NextResponse.json(newTrainer, { status: 201 }); // 201 Created
+    return NextResponse.json(updatedOrCreatedTrainer, { status: 200 });
   } catch (err: any) {
-    // 9. Better error handling
     if (err instanceof ZodError) {
       return NextResponse.json(
         { message: "Invalid form data", errors: err.errors },
         { status: 400 }
       );
     }
-    console.error("Error creating trainer:", err);
+    console.error("Error creating/updating trainer:", err);
     return NextResponse.json(
       { message: "An internal server error occurred." },
       { status: 500 }

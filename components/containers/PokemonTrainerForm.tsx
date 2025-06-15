@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { trainerSchema, TrainerFormData } from "@/lib/validation/trainer";
 import { useMutation } from "@tanstack/react-query";
+import { BadgeAlert } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import useTrainer from "@/hooks/useTrainer";
 
 export default function PokemonTrainerForm() {
@@ -71,8 +73,14 @@ export default function PokemonTrainerForm() {
   }, [trainerData, trainerId]);
 
   return (
-    <main className="p-8 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Pokemon Trainer Profile</h1>
+    <main className="p-6 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Pokémon Trainer Profile</h1>
+      <Badge variant="secondary" className="mb-4">
+        <BadgeAlert />
+        <span className="mx-1">
+          Fill in the information to create your Pokédex
+        </span>
+      </Badge>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
