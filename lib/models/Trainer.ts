@@ -13,7 +13,6 @@ const TrainerSchema = new Schema<ITrainer>(
     name: { type: String, required: true },
     age: { type: String, required: true },
     region: { type: String, required: true },
-    email: { type: String, required: true },
   },
   {
     timestamps: true, // optional: adds createdAt and updatedAt fields

@@ -4,8 +4,10 @@
 import React from "react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { trainerSchema, TrainerFormData } from "@/lib/validation/trainer";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -20,8 +22,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function PokemonTrainerForm() {
-  const [serverError, setServerError] = useState("");
   const { data: session } = useSession();
+  const params = useParams();
+  const trainerId = params.id?.[0];
 
   const form = useForm<TrainerFormData>({
     resolver: zodResolver(trainerSchema),
@@ -29,7 +32,6 @@ export default function PokemonTrainerForm() {
       name: "",
       age: "",
       region: "",
-      email: "",
     },
   });
 
@@ -46,16 +48,20 @@ export default function PokemonTrainerForm() {
         throw new Error(error.error || "Registration failed");
       }
 
+      toast.success("Register Successful!", {
+        description: "Trainer registered successfully!",
+      });
+
       return res.json();
     },
     onError: (err: any) => {
-      setServerError(err.message);
+      toast.error("Register Failed!", {
+        description: err.message,
+      });
     },
   });
 
   const onSubmit = (data: TrainerFormData) => {
-    setServerError("");
-
     mutation.mutate({
       ...data,
       userId: session?.user?.id,
@@ -63,14 +69,10 @@ export default function PokemonTrainerForm() {
   };
 
   React.useEffect(() => {
-    if (session?.user?.email) {
-      const currentFormValues = form.getValues();
-      form.reset({
-        ...currentFormValues,
-        email: session?.user?.email,
-      });
+    if (trainerId) {
+      //TODO: get trainer data by id
     }
-  }, [session, form.reset]);
+  }, []);
 
   return (
     <main className="p-8 max-w-md mx-auto">
@@ -116,35 +118,12 @@ export default function PokemonTrainerForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="ash@pokemon.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {serverError && <p className="text-red-600">{serverError}</p>}
 
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Submitting..." : "Register"}
           </Button>
         </form>
       </Form>
-
-      {mutation.isSuccess && (
-        <p className="mt-4 text-green-600">Trainer registered successfully!</p>
-      )}
     </main>
   );
 }
