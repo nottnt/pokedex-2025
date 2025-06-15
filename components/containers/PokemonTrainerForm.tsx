@@ -1,6 +1,9 @@
 // app/page.tsx
 "use client";
 
+import React from "react";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trainerSchema, TrainerFormData } from "@/lib/validation/trainer";
@@ -15,10 +18,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 export default function PokemonTrainerForm() {
   const [serverError, setServerError] = useState("");
+  const { data: session } = useSession();
 
   const form = useForm<TrainerFormData>({
     resolver: zodResolver(trainerSchema),
@@ -26,7 +29,7 @@ export default function PokemonTrainerForm() {
       name: "",
       age: "",
       region: "",
-      email: "",
+      email: session?.user?.email,
     },
   });
 
@@ -52,8 +55,22 @@ export default function PokemonTrainerForm() {
 
   const onSubmit = (data: TrainerFormData) => {
     setServerError("");
-    mutation.mutate(data);
+
+    mutation.mutate({
+      ...data,
+      userId: session?.user?.id,
+    });
   };
+
+  React.useEffect(() => {
+    if (session?.user?.email) {
+      const currentFormValues = form.getValues();
+      form.reset({
+        ...currentFormValues,
+        email: session?.user?.email,
+      });
+    }
+  }, [session, form.reset]);
 
   return (
     <main className="p-8 max-w-md mx-auto">

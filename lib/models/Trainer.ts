@@ -11,7 +11,7 @@ const TrainerSchema = new Schema<ITrainer>(
   {
     userId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
-    age: { type: Number, required: true },
+    age: { type: String, required: true },
     region: { type: String, required: true },
     email: { type: String, required: true },
   },
