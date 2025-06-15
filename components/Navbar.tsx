@@ -63,6 +63,11 @@ export function Navbar() {
               >
                 Profile
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => router.push(`/pokedex/${session ?? ""}`)}
+              >
+                Pokédex
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => signOut()}>
                 Logout
