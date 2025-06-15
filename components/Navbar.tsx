@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -28,9 +29,15 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 w-full bg-white border-b z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div
-          className="text-xl font-bold cursor-pointer"
+          className="flex items-center text-xl font-bold cursor-pointer"
           onClick={() => router.push("/")}
         >
+          <Image
+            src={"/images/pokédex.webp"}
+            alt={"pokédex"}
+            width="50"
+            height="50"
+          />
           Pokédex
         </div>
         {session ? (
