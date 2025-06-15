@@ -24,7 +24,7 @@ export default function PokemonTrainerForm() {
     resolver: zodResolver(trainerSchema),
     defaultValues: {
       name: "",
-      age: 10,
+      age: "",
       region: "",
       email: "",
     },
@@ -67,7 +67,7 @@ export default function PokemonTrainerForm() {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ash Ketchum" {...field} />
+                  <Input placeholder="Satoshi" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,7 +80,7 @@ export default function PokemonTrainerForm() {
               <FormItem>
                 <FormLabel>Age</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} />
+                  <Input type="number" placeholder="10" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
