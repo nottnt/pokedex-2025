@@ -38,7 +38,7 @@ export default function PokemonCard({ name, imageUrl, id }: PokemonCardProps) {
   const { data: pokemonForm, isLoading } = usePokemonForm(id);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-2">
+    <div className="bg-white hover:bg-secondary hover:text-primary cursor-pointer shadow-lg rounded-lg overflow-hidden p-2">
       <div className="relative w-full h-64">
         <Image
           src={imageUrl}
