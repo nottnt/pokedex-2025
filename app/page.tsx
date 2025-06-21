@@ -6,18 +6,17 @@ import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
 import { usePokemons } from "@/hooks/usePokemons";
 import { NamedAPIResource } from "pokenode-ts";
 import { DATA_PER_PAGE } from "@/constants";
+import { SearchPanel } from "@/components/compositions/SearchPanel";
 
 export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredPokemons, setFilteredPokemons] =
     useState<NamedAPIResource[]>(allPokemons);
   const [displayPokemons, setDisplayPokemons] =
     useState<NamedAPIResource[]>(allPokemons);
   const [page, setPage] = useState(1);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) initPokemons();
     else {
       const filteredPokemons = allPokemons.filter((pokemon) =>
@@ -70,22 +69,7 @@ export default function Home() {
 
   return (
     <main className="p-8">
-      {/* Search Panel */}
-      <form onSubmit={handleSearch} className="mb-8 flex gap-4">
-        <input
-          type="text"
-          placeholder="Search Pokémon..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2 w-full"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white rounded px-6 py-2 hover:bg-blue-700"
-        >
-          Search
-        </button>
-      </form>
+      <SearchPanel onSubmit={handleSearch} />
 
       {isLoading ? (
         <div className="text-center">Loading...</div>
