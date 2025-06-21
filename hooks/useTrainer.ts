@@ -1,10 +1,15 @@
 import { TrainerFormData } from "@/lib/validation/trainer";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import { toast } from "sonner";
 
 const useTrainer = (trainerId: string | undefined) => {
-  const { data, error, isError, isLoading } = useQuery<TrainerFormData, Error>({
+  const {
+    data,
+    error: queryError,
+    isError: isQueryError,
+    isLoading: isQueryLoading,
+  } = useQuery<TrainerFormData, Error>({
     queryKey: ["trainer", trainerId],
     queryFn: async () => {
       const res = await fetch(`/api/trainer/profile/?id=${trainerId}`);
@@ -23,15 +28,65 @@ const useTrainer = (trainerId: string | undefined) => {
     retry: false,
   });
 
+  const {
+    mutate: updateTrainer,
+    isPending: isUpdating,
+    error: mutationError,
+    isError: isMutationError,
+  } = useMutation({
+    mutationFn: async (data: TrainerFormData) => {
+      const res = await fetch("/api/trainer/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Update failed");
+      }
+
+      toast.success("Successful!", {
+        description: "Trainer information updated successfully!",
+      });
+
+      return res.json();
+    },
+    onError: (err: any) => {
+      toast.error("Update Failed!", {
+        description: err.message,
+      });
+    },
+  });
+
+  // Effect for handling query errors
   React.useEffect(() => {
-    if (isError && error) {
-      toast.error("Failed to get trainer data!", {
-        description: error.message,
+    if (isQueryError && queryError) {
+      toast.error("Failed to get Trainer data!", {
+        description: queryError.message,
       });
     }
-  }, [isError, error]);
+  }, [isQueryError, queryError]);
 
-  return { trainerData: data, isLoading, isError, error };
+  // Effect for handling mutation errors
+  React.useEffect(() => {
+    if (isMutationError && mutationError) {
+      toast.error("Failed to update Trainer!", {
+        description: mutationError.message,
+      });
+    }
+  }, [isMutationError, mutationError]);
+
+  return {
+    trainerData: data,
+    isLoading: isQueryLoading,
+    isError: isQueryError,
+    error: queryError,
+
+    // From useMutation
+    updateTrainer,
+    isUpdating,
+  };
 };
 
 export default useTrainer;
