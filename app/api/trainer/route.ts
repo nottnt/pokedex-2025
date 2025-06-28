@@ -9,40 +9,6 @@ import { ZodError } from "zod";
 import Trainer from "@/lib/models/Trainer";
 import User from "@/lib/models/User";
 
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json(
-        { message: "Trainer ID is required as a query parameter." },
-        { status: 400 }
-      );
-    }
-
-    await connectToDB();
-    const trainer = await Trainer.findOne({
-      _id: id,
-    });
-
-    if (!trainer) {
-      return NextResponse.json(
-        { message: `Trainer with ID "${id}" not found.` },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(trainer);
-  } catch (err: any) {
-    console.error("Error fetching trainer:", err);
-    return NextResponse.json(
-      { message: "An internal server error occurred." },
-      { status: 500 }
-    );
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     // 1. Authentication Check - No changes here
@@ -85,6 +51,20 @@ export async function POST(req: NextRequest) {
       );
     }
     console.error("Error creating/updating trainer:", err);
+    return NextResponse.json(
+      { message: "An internal server error occurred." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    await connectToDB();
+    const trainers = await Trainer.find({}).populate("userId");
+    return NextResponse.json(trainers);
+  } catch (err: any) {
+    console.error("Error fetching trainers:", err);
     return NextResponse.json(
       { message: "An internal server error occurred." },
       { status: 500 }

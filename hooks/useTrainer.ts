@@ -12,7 +12,7 @@ const useTrainer = (trainerId: string | undefined) => {
   } = useQuery<TrainerFormData, Error>({
     queryKey: ["trainer", trainerId],
     queryFn: async () => {
-      const res = await fetch(`/api/trainer/profile/?id=${trainerId}`);
+      const res = await fetch(`/api/trainer/${trainerId}`);
       if (!res.ok) {
         const errorData = await res
           .json()
@@ -35,7 +35,7 @@ const useTrainer = (trainerId: string | undefined) => {
     isError: isMutationError,
   } = useMutation({
     mutationFn: async (data: TrainerFormData) => {
-      const res = await fetch("/api/trainer/profile", {
+      const res = await fetch("/api/trainer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
