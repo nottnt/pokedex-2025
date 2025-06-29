@@ -22,8 +22,8 @@ export default function Pokedex() {
             imageUrl={getOfficialArtwork(`${pokemon.pokemonId}`)}
             id={pokemon.pokemonId}
             pokedexUpdateMode={PokedexUpdateMode.REMOVE}
-            removePokemonFromPokedex={(id: number) =>
-              removePokemonFromPokedex({ pokemonId: id })
+            removePokemonFromPokedex={(id: number, name: string) =>
+              removePokemonFromPokedex({ pokemonId: id, pokemonName: name })
             }
           />
         ))}

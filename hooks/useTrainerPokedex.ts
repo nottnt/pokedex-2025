@@ -12,6 +12,7 @@ interface AddPokemonPayload extends Pokemon {}
 
 interface RemovePokemonPayload {
   pokemonId: number;
+  pokemonName: string;
 }
 
 const useTrainerPokedex = (trainerId: string) => {
@@ -108,8 +109,11 @@ const useTrainerPokedex = (trainerId: string) => {
         return res.json();
       },
       // 3. After successfully adding, we must refetch the list.
-      onSuccess: (data: Pokemon) => {
-        toast.success(`${data?.pokemonName} was released from your Pokedex!`);
+      onSuccess: (_data: Pokemon, variables: RemovePokemonPayload) => {
+        console.log("variables", variables);
+        toast.success(
+          `${variables?.pokemonName} was released from your Pokedex!`
+        );
         // Invalidate the query for the trainer's pokedex list.
         // This tells React Query to refetch the data and update the UI.
         queryClient.invalidateQueries({

@@ -14,7 +14,7 @@ interface PokemonCardProps {
   id: number;
   pokedexUpdateMode?: PokedexUpdateMode;
   addPokemonToPokedex?: (id: number, name: string) => void;
-  removePokemonFromPokedex?: (id: number) => void;
+  removePokemonFromPokedex?: (id: number, name: string) => void;
 }
 
 interface PokemonTypeBadgeProps {
@@ -76,7 +76,7 @@ export default function PokemonCard({
             className="pokeball-image hover:animate-bounce"
             onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
               e.stopPropagation();
-              removePokemonFromPokedex?.(id);
+              removePokemonFromPokedex?.(id, name);
             }}
           />
         )}
