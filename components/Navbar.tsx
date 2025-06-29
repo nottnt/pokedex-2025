@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
+import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,19 +18,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { AuthDialog } from "./AuthDialog";
+import useTrainer from "@/hooks/useTrainer";
 
 export function Navbar() {
   const { data: session, status } = useSession();
-  const [openAuthDialog, setOpenAuthDialog] = useState(false);
+  const [openAuthDialog, setOpenAuthDialog] = React.useState(false);
   const router = useRouter();
+  const { trainerData } = useTrainer(session?.user?.trainer?._id as string);
+  const displayName = React.useMemo(() => {
+    return trainerData?.name ?? session?.user?.email;
+  }, [session?.user, trainerData]);
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white border-b z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div
-          className="text-xl font-bold cursor-pointer"
+          className="flex items-center text-xl font-bold cursor-pointer"
           onClick={() => router.push("/")}
         >
+          <Image
+            src={"/images/pokédex.webp"}
+            alt={"pokédex"}
+            width="50"
+            height="50"
+          />
           Pokédex
         </div>
         {session ? (
@@ -53,7 +64,7 @@ export function Navbar() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <p>Signed in as</p>
-                <p className="font-medium truncate">{session.user?.email}</p>
+                <p className="font-medium truncate">{displayName}</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -61,7 +72,16 @@ export function Navbar() {
                   router.push(`/trainer/${session.user?.trainer?._id ?? ""}`)
                 }
               >
-                Profile
+                Trainer Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() =>
+                  router.push(
+                    `/trainer/${session.user?.trainer?._id ?? ""}/pokedex`
+                  )
+                }
+              >
+                Pokédex
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => signOut()}>

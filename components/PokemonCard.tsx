@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { usePokemonForm } from "@/hooks/usePokemonForm";
 import { Badge } from "@/components/ui/badge";
 import { PokemonType } from "pokenode-ts";
-import { PokemonTypeName } from "@/types/common";
+import { PokemonTypeName, PokedexUpdateMode } from "@/types/common";
 
 interface PokemonCardProps {
   name: string;
   imageUrl: string;
   id: number;
+  pokedexUpdateMode?: PokedexUpdateMode;
+  addPokemonToPokedex?: (id: number, name: string) => void;
+  removePokemonFromPokedex?: (id: number, name: string) => void;
 }
 
 interface PokemonTypeBadgeProps {
@@ -34,11 +38,49 @@ const PokemonTypeBadge = ({ id, pokemonTypes }: PokemonTypeBadgeProps) => {
   );
 };
 
-export default function PokemonCard({ name, imageUrl, id }: PokemonCardProps) {
+export default function PokemonCard({
+  name,
+  imageUrl,
+  id,
+  addPokemonToPokedex,
+  removePokemonFromPokedex,
+  pokedexUpdateMode = PokedexUpdateMode.ADD,
+}: PokemonCardProps) {
+  const { data: session } = useSession();
+  const trainerId = session?.user?.trainer?._id as string;
   const { data: pokemonForm, isLoading } = usePokemonForm(id);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-2">
+    // MODIFICATION: Added has-[] variants to revert hover effect
+    <div className="bg-white hover:bg-secondary hover:text-primary has-[.pokeball-image:hover]:bg-white has-[.pokeball-image:hover]:text-inherit cursor-pointer shadow-lg rounded-lg overflow-hidden p-2">
+      <div className="p-2 flex justify-end">
+        {trainerId && pokedexUpdateMode === PokedexUpdateMode.ADD && (
+          <Image
+            src={"/images/pokéball.webp"}
+            alt={"pokéball"}
+            width="24"
+            height="24"
+            className="pokeball-image transition-transform duration-300 ease-in-out hover:rotate-20"
+            onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+              e.stopPropagation();
+              addPokemonToPokedex?.(id, name);
+            }}
+          />
+        )}
+        {trainerId && pokedexUpdateMode === PokedexUpdateMode.REMOVE && (
+          <Image
+            src={"/images/pokéball-open.webp"}
+            alt={"pokéball-open"}
+            width="30"
+            height="30"
+            className="pokeball-image hover:animate-bounce"
+            onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+              e.stopPropagation();
+              removePokemonFromPokedex?.(id, name);
+            }}
+          />
+        )}
+      </div>
       <div className="relative w-full h-64">
         <Image
           src={imageUrl}

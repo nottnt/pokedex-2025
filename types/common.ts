@@ -17,3 +17,8 @@ export type PokemonTypeName =
   | "dark"
   | "steel"
   | "fairy";
+
+export enum PokedexUpdateMode {
+  ADD = "add",
+  REMOVE = "remove",
+}

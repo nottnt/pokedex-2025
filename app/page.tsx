@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React from "react";
+import { useSession } from "next-auth/react";
 import PokemonCard from "@/components/PokemonCard";
 import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
 import { usePokemons } from "@/hooks/usePokemons";
+import useTrainerPokedex from "@/hooks/useTrainerPokedex";
 import { NamedAPIResource } from "pokenode-ts";
 import { DATA_PER_PAGE } from "@/constants";
+import { SearchPanel } from "@/components/compositions/SearchPanel";
 
 export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
-  const [searchTerm, setSearchTerm] = useState("");
+  const { data: session } = useSession();
+  const trainerId = session?.user?.trainer?._id as string;
+  const { addPokemonToPokedex, setOfTrainerPokedex } =
+    useTrainerPokedex(trainerId);
   const [filteredPokemons, setFilteredPokemons] =
-    useState<NamedAPIResource[]>(allPokemons);
+    React.useState<NamedAPIResource[]>(allPokemons);
   const [displayPokemons, setDisplayPokemons] =
-    useState<NamedAPIResource[]>(allPokemons);
-  const [page, setPage] = useState(1);
+    React.useState<NamedAPIResource[]>(allPokemons);
+  const [page, setPage] = React.useState(1);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) initPokemons();
     else {
       const filteredPokemons = allPokemons.filter((pokemon) =>
@@ -54,38 +59,23 @@ export default function Home() {
     setFilteredPokemons(allPokemons);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
     }
   }, [allPokemons]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     handleNextPage(page);
   }, [page]);
 
-  const hasNextPage = useMemo(() => {
+  const hasNextPage = React.useMemo(() => {
     return displayPokemons.length < filteredPokemons.length;
   }, [filteredPokemons, displayPokemons]);
 
   return (
     <main className="p-8">
-      {/* Search Panel */}
-      <form onSubmit={handleSearch} className="mb-8 flex gap-4">
-        <input
-          type="text"
-          placeholder="Search Pokémon..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2 w-full"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white rounded px-6 py-2 hover:bg-blue-700"
-        >
-          Search
-        </button>
-      </form>
+      <SearchPanel onSubmit={handleSearch} />
 
       {isLoading ? (
         <div className="text-center">Loading...</div>
@@ -93,14 +83,25 @@ export default function Home() {
         <>
           {/* Else show normal Pokémon list */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {displayPokemons.map((pokemon, index) => (
-              <PokemonCard
-                key={`${pokemon.name}-${index}`}
-                name={pokemon.name}
-                imageUrl={getOfficialArtwork(pokemon.url)}
-                id={getPokemonIdFromPokemonUrl(pokemon.url)}
-              />
-            ))}
+            {displayPokemons.map((pokemon, index) => {
+              const pokemonId = getPokemonIdFromPokemonUrl(pokemon.url);
+              const isAddedToPokedex = setOfTrainerPokedex.has(pokemonId);
+
+              return isAddedToPokedex ? null : (
+                <PokemonCard
+                  key={`${pokemon.name}-${index}`}
+                  name={pokemon.name}
+                  imageUrl={getOfficialArtwork(pokemon.url)}
+                  id={pokemonId}
+                  addPokemonToPokedex={(id: number, name: string) =>
+                    addPokemonToPokedex({
+                      pokemonId: id,
+                      pokemonName: name,
+                    })
+                  }
+                />
+              );
+            })}
           </div>
 
           {hasNextPage && (
