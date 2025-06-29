@@ -58,13 +58,6 @@ export default function Home() {
     setFilteredPokemons(allPokemons);
   };
 
-  const handleUpdatePokedex = (id: number, name: string) => {
-    addPokemonToPokedex({
-      pokemonId: id.toString(),
-      pokemonName: name,
-    });
-  };
-
   useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
@@ -95,7 +88,12 @@ export default function Home() {
                 name={pokemon.name}
                 imageUrl={getOfficialArtwork(pokemon.url)}
                 id={getPokemonIdFromPokemonUrl(pokemon.url)}
-                handleUpdatePokedex={handleUpdatePokedex}
+                addPokemonToPokedex={(id: number, name: string) =>
+                  addPokemonToPokedex({
+                    pokemonId: id,
+                    pokemonName: name,
+                  })
+                }
               />
             ))}
           </div>

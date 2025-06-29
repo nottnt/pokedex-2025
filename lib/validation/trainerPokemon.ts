@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { z } from "zod";
 
 export const trainerPokemonSchema = z.object({
-  pokemonId: z.string(),
+  pokemonId: z.number(),
   pokemonName: z.string(),
   trainerId: z
     .string()

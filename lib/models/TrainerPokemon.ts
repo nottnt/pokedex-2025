@@ -16,7 +16,7 @@ const TrainerPokemonSchema = new Schema<ITrainerPokemon>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Trainer",
     },
-    pokemonId: { type: String, required: true },
+    pokemonId: { type: Number, required: true },
     pokemonName: { type: String, required: true },
   },
   {

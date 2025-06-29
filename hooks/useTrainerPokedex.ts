@@ -2,21 +2,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { toast } from "sonner";
 
-// The shape of a Pokémon in the trainer's list
 interface Pokemon {
-  id: string; // The unique ID of this pokemon instance in the dex
-  pokemonId: string; // The general ID from the national dex (e.g., "25" for Pikachu)
-  name: string;
-  // ... other properties like level, caught_date, etc.
+  pokemonId: number;
+  pokemonName: string;
 }
 
 // The data needed to add a new Pokémon. Usually just the species ID.
-interface AddPokemonPayload {
-  pokemonId: string; // e.g., "1" for Bulbasaur, "25" for Pikachu
-  pokemonName: string; // e.g., "Bulbasaur", "Pikachu"
+interface AddPokemonPayload extends Pokemon {}
+
+interface RemovePokemonPayload {
+  pokemonId: number;
 }
 
-const useTrainerPokedex = (trainerId: string | undefined) => {
+const useTrainerPokedex = (trainerId: string) => {
   const queryClient = useQueryClient();
 
   // 1. The query now fetches the LIST of Pokémon for a given trainer.
@@ -86,6 +84,45 @@ const useTrainerPokedex = (trainerId: string | undefined) => {
       },
     });
 
+  const { mutate: removePokemonFromPokedex, isPending: isRemovingPokemon } =
+    useMutation<Pokemon, Error, RemovePokemonPayload>({
+      mutationFn: async (payload) => {
+        const res = await fetch(
+          `/api/trainer/${trainerId}/pokedex/${payload.pokemonId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res
+            .json()
+            .catch(() => ({ message: "An unknown error occurred" }));
+          throw new Error(
+            errorData.message || `Request failed with status ${res.status}`
+          );
+        }
+        return res.json();
+      },
+      // 3. After successfully adding, we must refetch the list.
+      onSuccess: () => {
+        toast.success("Pokémon released from your Pokedex!");
+        // Invalidate the query for the trainer's pokedex list.
+        // This tells React Query to refetch the data and update the UI.
+        queryClient.invalidateQueries({
+          queryKey: ["trainerPokedex", trainerId],
+        });
+      },
+      onError: (mutationError) => {
+        toast.error("Failed to add Pokémon!", {
+          description: mutationError.message,
+        });
+      },
+    });
+
   // Effect for handling query fetch errors
   React.useEffect(() => {
     if (isError && error) {
@@ -104,6 +141,8 @@ const useTrainerPokedex = (trainerId: string | undefined) => {
     // Function and state from the mutation
     addPokemonToPokedex,
     isAddingPokemon,
+    removePokemonFromPokedex,
+    isRemovingPokemon,
   };
 };
 

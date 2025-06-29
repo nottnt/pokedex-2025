@@ -1,9 +1,10 @@
 import { TrainerFormData } from "@/lib/validation/trainer";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { toast } from "sonner";
 
 const useTrainer = (trainerId: string | undefined) => {
+  const queryClient = useQueryClient();
   const {
     data,
     error: queryError,
@@ -46,11 +47,14 @@ const useTrainer = (trainerId: string | undefined) => {
         throw new Error(error.error || "Update failed");
       }
 
+      return res.json();
+    },
+    onSuccess: () => {
       toast.success("Successful!", {
         description: "Trainer information updated successfully!",
       });
 
-      return res.json();
+      queryClient.invalidateQueries({ queryKey: ["trainer"] });
     },
     onError: (err: any) => {
       toast.error("Update Failed!", {
