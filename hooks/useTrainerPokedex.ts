@@ -69,8 +69,8 @@ const useTrainerPokedex = (trainerId: string) => {
         return res.json();
       },
       // 3. After successfully adding, we must refetch the list.
-      onSuccess: () => {
-        toast.success("Pokémon added to your Pokedex!");
+      onSuccess: (data: Pokemon) => {
+        toast.success(`${data?.pokemonName} was added to your Pokedex!`);
         // Invalidate the query for the trainer's pokedex list.
         // This tells React Query to refetch the data and update the UI.
         queryClient.invalidateQueries({
@@ -108,8 +108,8 @@ const useTrainerPokedex = (trainerId: string) => {
         return res.json();
       },
       // 3. After successfully adding, we must refetch the list.
-      onSuccess: () => {
-        toast.success("Pokémon released from your Pokedex!");
+      onSuccess: (data: Pokemon) => {
+        toast.success(`${data?.pokemonName} was released from your Pokedex!`);
         // Invalidate the query for the trainer's pokedex list.
         // This tells React Query to refetch the data and update the UI.
         queryClient.invalidateQueries({
