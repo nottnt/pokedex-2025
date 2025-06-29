@@ -22,7 +22,7 @@ import useTrainer from "@/hooks/useTrainer";
 
 export default function PokemonTrainerForm() {
   const params = useParams();
-  const trainerId = params.id?.[0];
+  const trainerId = params.id as string;
   const { trainerData, isLoading, isError, updateTrainer, isUpdating } =
     useTrainer(trainerId);
 
