@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { usePokemonForm } from "@/hooks/usePokemonForm";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ interface PokemonCardProps {
   name: string;
   imageUrl: string;
   id: number;
+  handleUpdatePokedex: (id: number, name: string) => void;
 }
 
 interface PokemonTypeBadgeProps {
@@ -34,11 +36,38 @@ const PokemonTypeBadge = ({ id, pokemonTypes }: PokemonTypeBadgeProps) => {
   );
 };
 
-export default function PokemonCard({ name, imageUrl, id }: PokemonCardProps) {
+export default function PokemonCard({
+  name,
+  imageUrl,
+  id,
+  handleUpdatePokedex,
+}: PokemonCardProps) {
+  const { data: session } = useSession();
+  const trainerId = session?.user?.trainer?._id as string;
   const { data: pokemonForm, isLoading } = usePokemonForm(id);
 
+  const handleAddPokemonToPokedex = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+    handleUpdatePokedex(id, name);
+  };
+
   return (
-    <div className="bg-white hover:bg-secondary hover:text-primary cursor-pointer shadow-lg rounded-lg overflow-hidden p-2">
+    // MODIFICATION: Added has-[] variants to revert hover effect
+    <div className="bg-white hover:bg-secondary hover:text-primary has-[.pokeball-image:hover]:bg-white has-[.pokeball-image:hover]:text-inherit cursor-pointer shadow-lg rounded-lg overflow-hidden p-2">
+      <div className="p-2 flex justify-end">
+        {trainerId && (
+          <Image
+            src={"/images/pokéball.webp"}
+            alt={"pokéball"}
+            width="24"
+            height="24"
+            className="pokeball-image transition-transform duration-300 ease-in-out hover:rotate-20"
+            onClick={handleAddPokemonToPokedex}
+          />
+        )}
+      </div>
       <div className="relative w-full h-64">
         <Image
           src={imageUrl}

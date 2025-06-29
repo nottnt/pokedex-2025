@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import PokemonCard from "@/components/PokemonCard";
 import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
 import { usePokemons } from "@/hooks/usePokemons";
+import useTrainerPokedex from "@/hooks/useTrainerPokedex";
 import { NamedAPIResource } from "pokenode-ts";
 import { DATA_PER_PAGE } from "@/constants";
 import { SearchPanel } from "@/components/compositions/SearchPanel";
 
 export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
+  const { data: session } = useSession();
+  const trainerId = session?.user?.trainer?._id as string;
+  const { addPokemonToPokedex } = useTrainerPokedex(trainerId);
   const [filteredPokemons, setFilteredPokemons] =
     useState<NamedAPIResource[]>(allPokemons);
   const [displayPokemons, setDisplayPokemons] =
@@ -53,6 +58,13 @@ export default function Home() {
     setFilteredPokemons(allPokemons);
   };
 
+  const handleUpdatePokedex = (id: number, name: string) => {
+    addPokemonToPokedex({
+      pokemonId: id.toString(),
+      pokemonName: name,
+    });
+  };
+
   useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
@@ -83,6 +95,7 @@ export default function Home() {
                 name={pokemon.name}
                 imageUrl={getOfficialArtwork(pokemon.url)}
                 id={getPokemonIdFromPokemonUrl(pokemon.url)}
+                handleUpdatePokedex={handleUpdatePokedex}
               />
             ))}
           </div>
