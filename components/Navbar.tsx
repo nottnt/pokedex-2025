@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
@@ -22,10 +22,10 @@ import useTrainer from "@/hooks/useTrainer";
 
 export function Navbar() {
   const { data: session, status } = useSession();
-  const [openAuthDialog, setOpenAuthDialog] = useState(false);
+  const [openAuthDialog, setOpenAuthDialog] = React.useState(false);
   const router = useRouter();
   const { trainerData } = useTrainer(session?.user?.trainer?._id as string);
-  const displayName = useMemo(() => {
+  const displayName = React.useMemo(() => {
     return trainerData?.name ?? session?.user?.email;
   }, [session?.user, trainerData]);
 

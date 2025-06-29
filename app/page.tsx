@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useSession } from "next-auth/react";
 import PokemonCard from "@/components/PokemonCard";
 import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
@@ -14,12 +14,13 @@ export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
   const { data: session } = useSession();
   const trainerId = session?.user?.trainer?._id as string;
-  const { addPokemonToPokedex } = useTrainerPokedex(trainerId);
+  const { addPokemonToPokedex, setOfTrainerPokedex } =
+    useTrainerPokedex(trainerId);
   const [filteredPokemons, setFilteredPokemons] =
-    useState<NamedAPIResource[]>(allPokemons);
+    React.useState<NamedAPIResource[]>(allPokemons);
   const [displayPokemons, setDisplayPokemons] =
-    useState<NamedAPIResource[]>(allPokemons);
-  const [page, setPage] = useState(1);
+    React.useState<NamedAPIResource[]>(allPokemons);
+  const [page, setPage] = React.useState(1);
 
   const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) initPokemons();
@@ -58,17 +59,17 @@ export default function Home() {
     setFilteredPokemons(allPokemons);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
     }
   }, [allPokemons]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     handleNextPage(page);
   }, [page]);
 
-  const hasNextPage = useMemo(() => {
+  const hasNextPage = React.useMemo(() => {
     return displayPokemons.length < filteredPokemons.length;
   }, [filteredPokemons, displayPokemons]);
 
@@ -82,20 +83,25 @@ export default function Home() {
         <>
           {/* Else show normal Pokémon list */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {displayPokemons.map((pokemon, index) => (
-              <PokemonCard
-                key={`${pokemon.name}-${index}`}
-                name={pokemon.name}
-                imageUrl={getOfficialArtwork(pokemon.url)}
-                id={getPokemonIdFromPokemonUrl(pokemon.url)}
-                addPokemonToPokedex={(id: number, name: string) =>
-                  addPokemonToPokedex({
-                    pokemonId: id,
-                    pokemonName: name,
-                  })
-                }
-              />
-            ))}
+            {displayPokemons.map((pokemon, index) => {
+              const pokemonId = getPokemonIdFromPokemonUrl(pokemon.url);
+              const isAddedToPokedex = setOfTrainerPokedex.has(pokemonId);
+
+              return isAddedToPokedex ? null : (
+                <PokemonCard
+                  key={`${pokemon.name}-${index}`}
+                  name={pokemon.name}
+                  imageUrl={getOfficialArtwork(pokemon.url)}
+                  id={pokemonId}
+                  addPokemonToPokedex={(id: number, name: string) =>
+                    addPokemonToPokedex({
+                      pokemonId: id,
+                      pokemonName: name,
+                    })
+                  }
+                />
+              );
+            })}
           </div>
 
           {hasNextPage && (

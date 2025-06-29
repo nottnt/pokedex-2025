@@ -132,6 +132,10 @@ const useTrainerPokedex = (trainerId: string) => {
     }
   }, [isError, error]);
 
+  const setOfTrainerPokedex = React.useMemo((): Set<number> => {
+    return new Set(trainerPokedexData?.map((pokemon) => pokemon.pokemonId));
+  }, [trainerPokedexData]);
+
   return {
     // Data and state from the query
     trainerPokedexData,
@@ -143,6 +147,7 @@ const useTrainerPokedex = (trainerId: string) => {
     isAddingPokemon,
     removePokemonFromPokedex,
     isRemovingPokemon,
+    setOfTrainerPokedex,
   };
 };
 
