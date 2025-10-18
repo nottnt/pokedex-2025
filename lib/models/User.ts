@@ -3,7 +3,8 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
-  passwordHash: string;
+  passwordHash?: string; // Optional for OAuth users
+  name?: string; // Add name field for OAuth users
   emailVerified: Date | null;
   verificationToken: string | null;
   verificationTokenExpires: Date | null;
@@ -25,7 +26,11 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     passwordHash: {
       type: String,
-      required: [true, "Password hash is required"],
+      required: false, // Not required for OAuth users
+    },
+    name: {
+      type: String,
+      required: false, // Optional field for OAuth users
     },
     emailVerified: {
       type: Date,
