@@ -1,11 +1,13 @@
 // src/lib/authOptions.ts
 
 import GoogleProvider from "next-auth/providers/google";
+import type { GoogleProfile } from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { connectToDB } from "@/lib/mongodb";
 import User from "@/lib/models/User"; // Your Mongoose User model
 import { AuthOptions } from "next-auth";
+import { AuthProvider } from "@/types/common";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -111,18 +113,56 @@ export const authOptions: AuthOptions = {
     signIn: "/", // Since your login is a dialog on the root page
   },
   callbacks: {
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   // This callback is called on successful signin AFTER authorize.
-    //   // For Credentials, if authorize throws, this won't be hit.
-    //   // For OAuth, this is where you might check profile.email_verified
-    //   // and if false, prevent sign-in or flag the account.
-    //   if (account?.provider === "google" && profile && !profile.email_verified) {
-    //      console.log("Google sign-in attempt with unverified email:", profile.email);
-    //      // return false; // To deny access
-    //      // Or redirect to a specific page: return '/auth/verify-oauth-email-notice';
-    //   }
-    //   return true; // Allow sign in
-    // },
+    async signIn({ user, account, profile }) {
+      // This callback is called on successful signin AFTER authorize.
+      // For Google OAuth, create user if they don't exist
+      if (account?.provider === AuthProvider.GOOGLE && profile) {
+        try {
+          await connectToDB();
+
+          const googleProfile = profile as GoogleProfile;
+
+          // Check if user already exists
+          let existingUser = await User.findOne({
+            email: googleProfile.email?.toLowerCase()
+          });
+
+          // If user doesn't exist, create them
+          if (!existingUser) {
+            existingUser = await User.create({
+              email: googleProfile.email?.toLowerCase(),
+              name: googleProfile.name,
+              image: googleProfile.picture,
+              emailVerified: googleProfile.email_verified ? new Date() : null,
+              // Don't set passwordHash for OAuth users
+            });
+            console.log("Created new Google user:", existingUser.email);
+          } else {
+            // Update existing user with Google info if needed
+            if (!existingUser.image && googleProfile.picture) {
+              existingUser.image = googleProfile.picture;
+            }
+            if (!existingUser.name && googleProfile.name) {
+              existingUser.name = googleProfile.name;
+            }
+            if (!existingUser.emailVerified && googleProfile.email_verified) {
+              existingUser.emailVerified = new Date();
+            }
+            await existingUser.save();
+            console.log("Updated existing user with Google info:", existingUser.email);
+          }
+
+          // Update the user object that will be passed to JWT callback
+          user.id = (existingUser._id as string).toString();
+          user.trainer = existingUser.trainer;
+
+        } catch (error) {
+          console.error("Error handling Google sign-in:", error);
+          return false; // Prevent sign-in on error
+        }
+      }
+      return true; // Allow sign in
+    },
     async jwt({ token, user }) {
       // `user` is available on initial sign-in
       if (user) {
