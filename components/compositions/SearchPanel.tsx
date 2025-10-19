@@ -21,7 +21,7 @@ export function SearchPanel({ onSubmit }: SearchPanelProps) {
         <Input
           id="search"
           type="search"
-          placeholder="Search Pokémon..."
+          placeholder="Find your favorite Pokémon"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-4 pr-20 [&::-webkit-search-cancel-button]:hidden"
