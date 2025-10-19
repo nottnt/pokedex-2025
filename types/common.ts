@@ -22,3 +22,14 @@ export enum PokedexUpdateMode {
   ADD = "add",
   REMOVE = "remove",
 }
+
+export enum AuthProvider {
+  GOOGLE = "google",
+  CREDENTIALS = "credentials",
+}
+
+export enum AuthMode {
+  LOGIN = "login",
+  SIGNUP = "signup",
+  REQUEST_VERIFICATION = "requestVerification",
+}

@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { loginSchema, LoginInput } from "@/lib/validation/auth";
 import { useMutation } from "@tanstack/react-query";
+import { AuthProvider } from "@/types/common";
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
@@ -43,7 +44,7 @@ export function LoginForm({
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginInput) => {
-      const res = await signIn("credentials", {
+      const res = await signIn(AuthProvider.CREDENTIALS, {
         email: data.email,
         password: data.password,
         redirect: false,
@@ -142,7 +143,7 @@ export function LoginForm({
           <Button
             type="button"
             variant="secondary"
-            onClick={() => signIn("google", { callbackUrl: "/" })} // Assuming redirect happens globally or handled by next-auth
+            onClick={() => signIn(AuthProvider.GOOGLE, { callbackUrl: "/" })}
             disabled={loginMutation.isPending}
           >
             Sign in with Google
