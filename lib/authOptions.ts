@@ -5,9 +5,11 @@ import type { GoogleProfile } from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { connectToDB } from "@/lib/mongodb";
-import User from "@/lib/models/User"; // Your Mongoose User model
+import User from "@/lib/models/User";
+import Trainer from "@/lib/models/Trainer";
 import { AuthOptions } from "next-auth";
 import { AuthProvider } from "@/types/common";
+
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -136,14 +138,24 @@ export const authOptions: AuthOptions = {
               emailVerified: googleProfile.email_verified ? new Date() : null,
               // Don't set passwordHash for OAuth users
             });
+
+            const trainer = await Trainer.findOne({
+              userId: existingUser._id,
+            });
+
+            if (!trainer) {
+              const newTrainer = new Trainer({
+                userId: existingUser._id,
+                name: googleProfile.name,
+                createdAt: new Date(),
+              });
+              await newTrainer.save();
+            }
             console.log("Created new Google user:", existingUser.email);
           } else {
             // Update existing user with Google info if needed
             if (!existingUser.image && googleProfile.picture) {
               existingUser.image = googleProfile.picture;
-            }
-            if (!existingUser.name && googleProfile.name) {
-              existingUser.name = googleProfile.name;
             }
             if (!existingUser.emailVerified && googleProfile.email_verified) {
               existingUser.emailVerified = new Date();
