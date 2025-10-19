@@ -9,6 +9,8 @@ import useTrainerPokedex from "@/hooks/useTrainerPokedex";
 import { NamedAPIResource } from "pokenode-ts";
 import { DATA_PER_PAGE } from "@/constants";
 import { SearchPanel } from "@/components/compositions/SearchPanel";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
@@ -21,6 +23,7 @@ export default function Home() {
   const [displayPokemons, setDisplayPokemons] =
     React.useState<NamedAPIResource[]>(allPokemons);
   const [page, setPage] = React.useState(1);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) initPokemons();
@@ -106,12 +109,31 @@ export default function Home() {
 
           {hasNextPage && (
             <div className="flex justify-center mt-8">
-              <button
-                onClick={() => setPage((prev) => prev + 1)}
-                className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 disabled:opacity-50"
+              <Button
+                onClick={async () => {
+                  setIsLoadingMore(true);
+                  // Add small delay to show loading state
+                  await new Promise(resolve => setTimeout(resolve, 300));
+                  setPage((prev) => prev + 1);
+                  setIsLoadingMore(false);
+                }}
+                disabled={isLoadingMore}
+                variant="outline"
+                size="lg"
+                className="min-w-[140px] bg-background hover:bg-muted"
               >
-                Load More
-              </button>
+                {isLoadingMore ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="mr-2 h-4 w-4" />
+                    Load More
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </>
