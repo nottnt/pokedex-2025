@@ -14,13 +14,12 @@ import { useRouter } from "next/navigation";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { RequestVerificationEmailForm } from "@/components/auth/RequestVerificationEmailForm"; // Import the new form
-
-type AuthMode = "login" | "signup" | "requestVerification"; // Updated type
+import { AuthMode } from "@/types/common";
 
 export function AuthDialog() {
   const router = useRouter();
   // Updated state: from isSignUpMode (boolean) to authMode (string literal)
-  const [authMode, setAuthMode] = React.useState<AuthMode>("login");
+  const [authMode, setAuthMode] = React.useState<AuthMode>(AuthMode.LOGIN);
   const [initialEmail, setInitialEmail] = React.useState<string>(""); // Keep this for pre-filling
 
   const handleLoginSuccess = () => {
@@ -34,7 +33,7 @@ export function AuthDialog() {
   const handleSignUpSuccess = (messageFromForm: string, email: string) => {
     toast.success("Action Successful!", { description: messageFromForm });
     setInitialEmail(email); // Pre-fill for login
-    setAuthMode("login"); // Switch to login mode
+    setAuthMode(AuthMode.LOGIN); // Switch to login mode
   };
 
   // This handler is called by RequestVerificationEmailForm *within AuthDialog*
@@ -44,22 +43,22 @@ export function AuthDialog() {
   ) => {
     toast.success("Verification Email Sent", { description: message });
     setInitialEmail(email); // Keep email for potential login pre-fill
-    setAuthMode("login"); // Switch to login mode
+    setAuthMode(AuthMode.LOGIN); // Switch to login mode
   };
 
   const switchToSignUp = () => {
     setInitialEmail(""); // Clear email when switching to fresh signup
-    setAuthMode("signup");
+    setAuthMode(AuthMode.SIGNUP);
   };
 
   const switchToLogin = (emailToPreFill?: string) => {
     setInitialEmail(emailToPreFill || initialEmail || ""); // Use provided, existing, or empty
-    setAuthMode("login");
+    setAuthMode(AuthMode.LOGIN);
   };
 
   const switchToRequestVerification = (emailToPreFill?: string) => {
     setInitialEmail(emailToPreFill || initialEmail || ""); // Use provided, existing, or empty
-    setAuthMode("requestVerification");
+    setAuthMode(AuthMode.REQUEST_VERIFICATION);
   };
 
   // Memoize email for child form keys to ensure re-initialization
@@ -69,22 +68,22 @@ export function AuthDialog() {
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
-          {authMode === "signup"
+          {authMode === AuthMode.SIGNUP
             ? "Create an Account"
-            : authMode === "requestVerification"
+            : authMode === AuthMode.REQUEST_VERIFICATION
             ? "Resend Verification Email"
             : "Sign In"}
         </DialogTitle>
         <DialogDescription>
-          {authMode === "signup"
+          {authMode === AuthMode.SIGNUP
             ? "Enter your details below to create your account."
-            : authMode === "requestVerification"
+            : authMode === AuthMode.REQUEST_VERIFICATION
             ? "Enter your email address. If an account requires verification, we'll send a new link."
             : "Access your account or sign in with Google."}
         </DialogDescription>
       </DialogHeader>
 
-      {authMode === "login" && (
+      {authMode === AuthMode.LOGIN && (
         <LoginForm
           key={`login-${emailForChildForms}`} // Ensure re-render if initialEmail changes
           initialEmail={emailForChildForms}
@@ -100,7 +99,7 @@ export function AuthDialog() {
         />
       )}
 
-      {authMode === "signup" && (
+      {authMode === AuthMode.SIGNUP && (
         <SignUpForm
           // Ensure SignUpForm's prop is named onSignUpAndEmailSent if that's what it expects
           onSignUpSuccess={handleSignUpSuccess}
@@ -108,7 +107,7 @@ export function AuthDialog() {
         />
       )}
 
-      {authMode === "requestVerification" && (
+      {authMode === AuthMode.REQUEST_VERIFICATION && (
         <RequestVerificationEmailForm
           key={`req-verify-${emailForChildForms}`} // Ensure re-render if initialEmail changes
           initialEmail={emailForChildForms}
@@ -120,7 +119,7 @@ export function AuthDialog() {
 
       {/* Footer Links for Mode Switching */}
       <div className="mt-4 text-center text-sm">
-        {authMode === "login" && (
+        {authMode === AuthMode.LOGIN && (
           <div className="space-y-1">
             <p>
               Don&apos;t have an account?{" "}
@@ -146,7 +145,7 @@ export function AuthDialog() {
             </p>
           </div>
         )}
-        {authMode === "signup" && (
+        {authMode === AuthMode.SIGNUP && (
           <p>
             Already have an account?{" "}
             <Button
@@ -158,7 +157,7 @@ export function AuthDialog() {
             </Button>
           </p>
         )}
-        {authMode === "requestVerification" && (
+        {authMode === AuthMode.REQUEST_VERIFICATION && (
           <p>
             Remembered your password or email is verified?{" "}
             <Button
