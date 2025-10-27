@@ -18,10 +18,12 @@ export default function Home() {
   const trainerId = session?.user?.trainer?._id as string;
   const { addPokemonToPokedex, setOfTrainerPokedex } =
     useTrainerPokedex(trainerId);
-  const [filteredPokemons, setFilteredPokemons] =
-    React.useState<NamedAPIResource[]>(allPokemons);
-  const [displayPokemons, setDisplayPokemons] =
-    React.useState<NamedAPIResource[]>(allPokemons);
+  const [filteredPokemons, setFilteredPokemons] = React.useState<
+    NamedAPIResource[]
+  >([]);
+  const [displayPokemons, setDisplayPokemons] = React.useState<
+    NamedAPIResource[]
+  >([]);
   const [page, setPage] = React.useState(1);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
@@ -69,7 +71,10 @@ export default function Home() {
   }, [allPokemons]);
 
   React.useEffect(() => {
-    handleNextPage(page);
+    // Only handle next page if it's not the initial page (page 1)
+    if (page > 1) {
+      handleNextPage(page);
+    }
   }, [page]);
 
   const hasNextPage = React.useMemo(() => {
@@ -86,25 +91,29 @@ export default function Home() {
         <>
           {/* Else show normal Pokémon list */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {displayPokemons.map((pokemon, index) => {
-              const pokemonId = getPokemonIdFromPokemonUrl(pokemon.url);
-              const isAddedToPokedex = setOfTrainerPokedex.has(pokemonId);
+            {displayPokemons
+              .filter((pokemon) => {
+                const pokemonId = getPokemonIdFromPokemonUrl(pokemon.url);
+                return !setOfTrainerPokedex.has(pokemonId);
+              })
+              .map((pokemon, index) => {
+                const pokemonId = getPokemonIdFromPokemonUrl(pokemon.url);
 
-              return isAddedToPokedex ? null : (
-                <PokemonCard
-                  key={`${pokemon.name}-${index}`}
-                  name={pokemon.name}
-                  imageUrl={getOfficialArtwork(pokemon.url)}
-                  id={pokemonId}
-                  addPokemonToPokedex={(id: number, name: string) =>
-                    addPokemonToPokedex({
-                      pokemonId: id,
-                      pokemonName: name,
-                    })
-                  }
-                />
-              );
-            })}
+                return (
+                  <PokemonCard
+                    key={`${pokemon.name}-${index}`}
+                    name={pokemon.name}
+                    imageUrl={getOfficialArtwork(pokemon.url)}
+                    id={pokemonId}
+                    addPokemonToPokedex={(id: number, name: string) =>
+                      addPokemonToPokedex({
+                        pokemonId: id,
+                        pokemonName: name,
+                      })
+                    }
+                  />
+                );
+              })}
           </div>
 
           {hasNextPage && (
@@ -113,7 +122,7 @@ export default function Home() {
                 onClick={async () => {
                   setIsLoadingMore(true);
                   // Add small delay to show loading state
-                  await new Promise(resolve => setTimeout(resolve, 300));
+                  await new Promise((resolve) => setTimeout(resolve, 300));
                   setPage((prev) => prev + 1);
                   setIsLoadingMore(false);
                 }}
