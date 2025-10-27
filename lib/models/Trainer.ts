@@ -22,8 +22,8 @@ const TrainerSchema = new Schema<ITrainer>(
       ref: "User",
     },
     name: { type: String, required: true },
-    age: { type: String, required: true },
-    region: { type: String, required: true },
+    age: { type: String },
+    region: { type: String },
   },
   {
     timestamps: true,

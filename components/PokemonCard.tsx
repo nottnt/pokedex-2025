@@ -60,7 +60,7 @@ export default function PokemonCard({
             alt={"pokéball"}
             width="24"
             height="24"
-            className="pokeball-image transition-transform duration-300 ease-in-out hover:rotate-20"
+            className="pokeball-image cursor-pointer transition-transform duration-300 ease-in-out hover:rotate-20"
             onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
               e.stopPropagation();
               addPokemonToPokedex?.(id, name);
@@ -73,7 +73,7 @@ export default function PokemonCard({
             alt={"pokéball-open"}
             width="30"
             height="30"
-            className="pokeball-image hover:animate-bounce"
+            className="pokeball-image cursor-pointer hover:animate-bounce"
             onClick={(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
               e.stopPropagation();
               removePokemonFromPokedex?.(id, name);

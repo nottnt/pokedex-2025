@@ -5,9 +5,11 @@ import type { GoogleProfile } from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { connectToDB } from "@/lib/mongodb";
-import User from "@/lib/models/User"; // Your Mongoose User model
+import User from "@/lib/models/User";
+import Trainer from "@/lib/models/Trainer";
 import { AuthOptions } from "next-auth";
 import { AuthProvider } from "@/types/common";
+import mongoose from "mongoose";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -124,8 +126,8 @@ export const authOptions: AuthOptions = {
 
           // Check if user already exists
           let existingUser = await User.findOne({
-            email: googleProfile.email?.toLowerCase()
-          });
+            email: googleProfile.email?.toLowerCase(),
+          }).populate("trainer");
 
           // If user doesn't exist, create them
           if (!existingUser) {
@@ -136,26 +138,43 @@ export const authOptions: AuthOptions = {
               emailVerified: googleProfile.email_verified ? new Date() : null,
               // Don't set passwordHash for OAuth users
             });
-            console.log("Created new Google user:", existingUser.email);
+
+            const trainer = await Trainer.findOne({
+              userId: existingUser._id,
+            });
+
+            if (!trainer) {
+              const newTrainer = new Trainer({
+                userId: existingUser._id,
+                name: googleProfile.name,
+                createdAt: new Date(),
+              });
+              await newTrainer.save();
+              await User.findByIdAndUpdate(existingUser._id, {
+                $set: { trainer: newTrainer._id },
+              });
+              existingUser = await User.findById(existingUser._id).populate(
+                "trainer"
+              );
+            }
           } else {
             // Update existing user with Google info if needed
             if (!existingUser.image && googleProfile.picture) {
               existingUser.image = googleProfile.picture;
             }
-            if (!existingUser.name && googleProfile.name) {
-              existingUser.name = googleProfile.name;
-            }
             if (!existingUser.emailVerified && googleProfile.email_verified) {
               existingUser.emailVerified = new Date();
             }
             await existingUser.save();
-            console.log("Updated existing user with Google info:", existingUser.email);
+            console.log(
+              "Updated existing user with Google info:",
+              existingUser.email
+            );
           }
 
           // Update the user object that will be passed to JWT callback
-          user.id = (existingUser._id as string).toString();
-          user.trainer = existingUser.trainer;
-
+          user.id = (existingUser?._id as string).toString();
+          user.trainer = existingUser?.trainer;
         } catch (error) {
           console.error("Error handling Google sign-in:", error);
           return false; // Prevent sign-in on error
