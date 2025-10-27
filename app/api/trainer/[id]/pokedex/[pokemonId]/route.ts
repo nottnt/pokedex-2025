@@ -4,10 +4,10 @@ import TrainerPokemon from "@/lib/models/TrainerPokemon";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; pokemonId: string } }
+  { params }: { params: Promise<{ id: string; pokemonId: string }> }
 ) {
   try {
-    const { id: trainerId, pokemonId } = params;
+    const { id: trainerId, pokemonId } = await params;
 
     await connectToDB();
 

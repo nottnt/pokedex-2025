@@ -4,11 +4,11 @@ import Trainer from "@/lib/models/Trainer";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
+  const { id } = await params;
 
+  try {
     await connectToDB();
 
     const trainer = await Trainer.findById(id);
@@ -25,7 +25,7 @@ export async function GET(
     // This catches errors like an invalid MongoDB ObjectId format
     if (err.kind === "ObjectId") {
       return NextResponse.json(
-        { message: `Invalid Trainer ID format: "${params.id}"` },
+        { message: `Invalid Trainer ID format: "${id}"` },
         { status: 400 }
       );
     }
