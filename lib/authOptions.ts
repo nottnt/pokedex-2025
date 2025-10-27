@@ -150,6 +150,9 @@ export const authOptions: AuthOptions = {
                 createdAt: new Date(),
               });
               await newTrainer.save();
+              await User.findByIdAndUpdate(existingUser._id, {
+                $set: { trainer: newTrainer._id },
+              });
             }
             console.log("Created new Google user:", existingUser.email);
           } else {
