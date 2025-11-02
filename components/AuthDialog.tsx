@@ -123,7 +123,7 @@ export function AuthDialog() {
         <SignUpForm
           // Ensure SignUpForm's prop is named onSignUpAndEmailSent if that's what it expects
           onSignUpSuccess={handleSignUpSuccess}
-          onSwitchToLogin={() => switchToLogin()}
+          onSwitchToLogin={switchToLogin}
         />
       )}
 

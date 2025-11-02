@@ -34,7 +34,7 @@ interface ResendApiResponse {
 interface SignUpFormProps {
   // Called only when an email (initial or resent) is successfully dispatched
   onSignUpSuccess: (message: string, email: string) => void;
-  onSwitchToLogin: () => void;
+  onSwitchToLogin: (emailToPreFill?: string) => void;
 }
 
 interface SignUpErrorResponse {
@@ -323,18 +323,12 @@ export function SignUpForm({
                 : "Resend Verification Email"}
             </Button>
           ) : null}
-
-          {/* Optional: If resend succeeds, maybe a button to proceed to login */}
           {uiState === "resendSuccess" && (
             <Button
               type="button"
               onClick={() => {
                 if (userEmailForResend) {
-                  // This was already called in resendMutation's onSuccess,
-                  // but if user didn't click away, this button could explicitly trigger it.
-                  // Or, this button could directly call onSwitchToLogin.
-                  // For now, we assume onSignUpSuccess already handled transition.
-                  // onSwitchToLogin(); // Or let parent handle via onSignUpSuccess
+                  onSwitchToLogin(userEmailForResend);
                 }
               }}
               className="bg-green-600 hover:bg-green-700"
