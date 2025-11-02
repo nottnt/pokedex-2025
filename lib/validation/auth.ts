@@ -52,7 +52,6 @@ export const resetPasswordSchema = z
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => {
-    console.log('resetPasswordSchema data', data);
     return data.password === data.confirmPassword
   }, {
     message: "Passwords don't match",
