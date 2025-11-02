@@ -46,6 +46,9 @@ export async function GET(req: NextRequest) {
         createdAt: new Date(),
       });
       await newTrainer.save();
+      await User.findByIdAndUpdate(user._id, {
+        $set: { trainer: newTrainer._id },
+      });
     }
 
     return NextResponse.redirect(new URL("/?verified=true", appUrl), {
