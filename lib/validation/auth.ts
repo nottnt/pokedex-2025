@@ -8,6 +8,10 @@ const passwordProperty = z
     "Password must contain at least one uppercase letter, one lowercase letter, and one number"
   );
 
+const confirmPasswordProperty = z
+  .string()
+  .min(1, "Please confirm your password");
+
 export const loginSchema = z.object({
   email: z.string().email(),
   password: passwordProperty,
@@ -18,10 +22,8 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export const signUpSchema = z
   .object({
     email: z.string().email({ message: "Invalid email address" }),
-    password: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters" }),
-    confirmPassword: z.string(),
+    password: passwordProperty,
+    confirmPassword: confirmPasswordProperty,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -49,13 +51,16 @@ export const resetPasswordSchema = z
   .object({
     token: z.string().min(1, "Reset token is required"),
     password: passwordProperty,
-    confirmPassword: z.string().min(1, "Please confirm your password"),
+    confirmPassword: confirmPasswordProperty,
   })
-  .refine((data) => {
-    return data.password === data.confirmPassword
-  }, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+  .refine(
+    (data) => {
+      return data.password === data.confirmPassword;
+    },
+    {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+    }
+  );
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
