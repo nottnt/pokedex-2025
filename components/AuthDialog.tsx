@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { RequestVerificationEmailForm } from "@/components/auth/RequestVerificationEmailForm"; // Import the new form
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
+import { ResetPasswordSentForm } from "@/components/auth/ResetPasswordSentForm";
 import { AuthMode } from "@/types/common";
 
 export function AuthDialog() {
@@ -61,6 +63,16 @@ export function AuthDialog() {
     setAuthMode(AuthMode.REQUEST_VERIFICATION);
   };
 
+  const switchToForgotPassword = (emailToPreFill?: string) => {
+    setInitialEmail(emailToPreFill || initialEmail || ""); // Use provided, existing, or empty
+    setAuthMode(AuthMode.FORGOT_PASSWORD);
+  };
+
+  const switchToResetPasswordSent = (email: string) => {
+    setInitialEmail(email);
+    setAuthMode(AuthMode.RESET_PASSWORD_SENT);
+  };
+
   // Memoize email for child form keys to ensure re-initialization
   const emailForChildForms = React.useMemo(() => initialEmail, [initialEmail]);
 
@@ -72,6 +84,10 @@ export function AuthDialog() {
             ? "Create an Account"
             : authMode === AuthMode.REQUEST_VERIFICATION
             ? "Resend Verification Email"
+            : authMode === AuthMode.FORGOT_PASSWORD
+            ? "Reset Password"
+            : authMode === AuthMode.RESET_PASSWORD_SENT
+            ? "Check Your Email"
             : "Sign In"}
         </DialogTitle>
         <DialogDescription>
@@ -79,6 +95,10 @@ export function AuthDialog() {
             ? "Enter your details below to create your account."
             : authMode === AuthMode.REQUEST_VERIFICATION
             ? "Enter your email address. If an account requires verification, we'll send a new link."
+            : authMode === AuthMode.FORGOT_PASSWORD
+            ? "Enter your email address and we'll send you a password reset link."
+            : authMode === AuthMode.RESET_PASSWORD_SENT
+            ? "We've sent you a password reset link if an account exists with that email."
             : "Access your account or sign in with Google."}
         </DialogDescription>
       </DialogHeader>
@@ -88,7 +108,6 @@ export function AuthDialog() {
           key={`login-${emailForChildForms}`} // Ensure re-render if initialEmail changes
           initialEmail={emailForChildForms}
           onLoginSuccess={handleLoginSuccess}
-          onSwitchToSignUp={switchToSignUp}
           onRequestVerificationNeeded={(emailFromLoginAttempt) => {
             // Callback from LoginForm
             toast.error("Email Not Verified", {
@@ -96,6 +115,7 @@ export function AuthDialog() {
             });
             switchToRequestVerification(emailFromLoginAttempt);
           }}
+          onSwitchToForgotPassword={switchToForgotPassword}
         />
       )}
 
@@ -114,6 +134,23 @@ export function AuthDialog() {
           onSuccess={handleRequestVerificationSuccessInDialog}
           submitButtonText="Send Verification Link"
           // No explicit cancel button needed here if dialog close handles it
+        />
+      )}
+
+      {authMode === AuthMode.FORGOT_PASSWORD && (
+        <ForgotPasswordForm
+          key={`forgot-password-${emailForChildForms}`} // Ensure re-render if initialEmail changes
+          initialEmail={emailForChildForms}
+          onBackToLogin={() => switchToLogin(emailForChildForms)}
+          onResetEmailSent={switchToResetPasswordSent}
+        />
+      )}
+
+      {authMode === AuthMode.RESET_PASSWORD_SENT && (
+        <ResetPasswordSentForm
+          email={emailForChildForms}
+          onBackToLogin={() => switchToLogin(emailForChildForms)}
+          onTryDifferentEmail={() => switchToForgotPassword(emailForChildForms)}
         />
       )}
 
@@ -166,6 +203,30 @@ export function AuthDialog() {
               onClick={() => switchToLogin(emailForChildForms)}
             >
               Sign In
+            </Button>
+          </p>
+        )}
+        {authMode === AuthMode.FORGOT_PASSWORD && (
+          <p>
+            Remembered your password?{" "}
+            <Button
+              variant="link"
+              className="p-0 h-auto"
+              onClick={() => switchToLogin(emailForChildForms)}
+            >
+              Sign In
+            </Button>
+          </p>
+        )}
+        {authMode === AuthMode.RESET_PASSWORD_SENT && (
+          <p>
+            Need help?{" "}
+            <Button
+              variant="link"
+              className="p-0 h-auto"
+              onClick={() => switchToLogin(emailForChildForms)}
+            >
+              Back to Login
             </Button>
           </p>
         )}

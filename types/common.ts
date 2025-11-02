@@ -32,4 +32,6 @@ export enum AuthMode {
   LOGIN = "login",
   SIGNUP = "signup",
   REQUEST_VERIFICATION = "requestVerification",
+  FORGOT_PASSWORD = "forgotPassword",
+  RESET_PASSWORD_SENT = "resetPasswordSent",
 }

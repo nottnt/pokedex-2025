@@ -22,15 +22,15 @@ import { AuthProvider } from "@/types/common";
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
-  onSwitchToSignUp: () => void;
   onRequestVerificationNeeded: (email: string) => void;
+  onSwitchToForgotPassword: (email: string) => void;
   initialEmail?: string;
 }
 
 export function LoginForm({
   onLoginSuccess,
-  onSwitchToSignUp,
   onRequestVerificationNeeded,
+  onSwitchToForgotPassword,
   initialEmail,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -129,6 +129,19 @@ export function LoginForm({
             </FormItem>
           )}
         />
+
+        <div className="text-right">
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            onClick={() => onSwitchToForgotPassword(form.getValues("email"))}
+            disabled={loginMutation.isPending}
+            className="p-0 h-auto text-sm"
+          >
+            Forgot password?
+          </Button>
+        </div>
 
         {form.formState.errors.root?.serverError && (
           <p className="text-sm font-medium text-destructive">
