@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import PokemonCard from "@/components/PokemonCard";
 import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
 import { usePokemons } from "@/hooks/usePokemons";
@@ -15,15 +17,16 @@ import { ChevronDown, Loader2 } from "lucide-react";
 export default function Home() {
   const { data: allPokemons = [], isLoading } = usePokemons();
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const trainerId = session?.user?.trainer?._id as string;
   const { addPokemonToPokedex, setOfTrainerPokedex } =
     useTrainerPokedex(trainerId);
-  const [filteredPokemons, setFilteredPokemons] = useState<
-    NamedAPIResource[]
-  >([]);
-  const [displayPokemons, setDisplayPokemons] = useState<
-    NamedAPIResource[]
-  >([]);
+  const [filteredPokemons, setFilteredPokemons] = useState<NamedAPIResource[]>(
+    []
+  );
+  const [displayPokemons, setDisplayPokemons] = useState<NamedAPIResource[]>(
+    []
+  );
   const [page, setPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -54,7 +57,7 @@ export default function Home() {
       (page - 1) * DATA_PER_PAGE,
       page * DATA_PER_PAGE
     );
-    console.log("nextPokemons", nextPokemons);
+
     setDisplayPokemons((prev) => [...prev, ...nextPokemons]);
   };
 
@@ -69,6 +72,24 @@ export default function Home() {
       initPokemons();
     }
   }, [allPokemons]);
+
+  // Check for email verification success
+  useEffect(() => {
+    const verified = searchParams.get("verified");
+    if (verified === "true") {
+      setTimeout(() => {
+        toast.success("Email Verified!", {
+          description:
+            "Your email has been successfully verified. Welcome to Pokédex-2025!",
+        });
+      }, 500); // Slight delay to ensure toast shows after redirect
+
+      // Remove the query parameter from URL without page refresh
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("verified");
+      window.history.replaceState({}, "", newUrl.pathname + newUrl.search);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Only handle next page if it's not the initial page (page 1)
