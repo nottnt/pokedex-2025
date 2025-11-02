@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 interface Pokemon {
@@ -128,7 +128,7 @@ const useTrainerPokedex = (trainerId: string) => {
     });
 
   // Effect for handling query fetch errors
-  React.useEffect(() => {
+  useEffect(() => {
     if (isError && error) {
       toast.error("Failed to fetch trainer's Pokedex!", {
         description: error.message,
@@ -136,7 +136,7 @@ const useTrainerPokedex = (trainerId: string) => {
     }
   }, [isError, error]);
 
-  const setOfTrainerPokedex = React.useMemo((): Set<number> => {
+  const setOfTrainerPokedex = useMemo((): Set<number> => {
     return new Set(trainerPokedexData?.map((pokemon) => pokemon.pokemonId));
   }, [trainerPokedexData]);
 

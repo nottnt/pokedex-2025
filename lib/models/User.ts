@@ -7,6 +7,8 @@ export interface IUser extends Document {
   emailVerified: Date | null;
   verificationToken: string | null;
   verificationTokenExpires: Date | null;
+  passwordResetToken: string | null;
+  passwordResetTokenExpires: Date | null;
   createdAt: Date;
   updatedAt: Date;
   image?: string;
@@ -36,6 +38,14 @@ const UserSchema: Schema<IUser> = new Schema(
       default: null,
     },
     verificationTokenExpires: {
+      type: Date,
+      default: null,
+    },
+    passwordResetToken: {
+      type: String,
+      default: null,
+    },
+    passwordResetTokenExpires: {
       type: Date,
       default: null,
     },
