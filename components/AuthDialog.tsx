@@ -64,7 +64,7 @@ export function AuthDialog() {
   };
 
   const switchToForgotPassword = (emailToPreFill?: string) => {
-    setInitialEmail(emailToPreFill || initialEmail || ""); // Use provided, existing, or empty
+    setInitialEmail(emailToPreFill || ""); // Use provided, existing, or empty
     setAuthMode(AuthMode.FORGOT_PASSWORD);
   };
 
@@ -150,7 +150,7 @@ export function AuthDialog() {
         <ResetPasswordSentForm
           email={emailForChildForms}
           onBackToLogin={() => switchToLogin(emailForChildForms)}
-          onTryDifferentEmail={() => switchToForgotPassword(emailForChildForms)}
+          onTryDifferentEmail={() => switchToForgotPassword()}
         />
       )}
 
