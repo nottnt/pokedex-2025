@@ -45,11 +45,7 @@ export async function GET(req: NextRequest) {
         name: user.email.split("@")[0], // Default name based on email
         createdAt: new Date(),
       });
-      const trainer = await newTrainer.save();
-
-      return NextResponse.redirect(new URL(`/trainer/${trainer._id}`, appUrl), {
-        status: 302,
-      });
+      await newTrainer.save();
     }
 
     return NextResponse.redirect(new URL("/?verified=true", appUrl), {
