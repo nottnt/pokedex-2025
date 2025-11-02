@@ -1,6 +1,6 @@
 import { TrainerFormData } from "@/lib/validation/trainer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 const useTrainer = (trainerId: string | undefined) => {
@@ -64,7 +64,7 @@ const useTrainer = (trainerId: string | undefined) => {
   });
 
   // Effect for handling query errors
-  React.useEffect(() => {
+  useEffect(() => {
     if (isQueryError && queryError) {
       toast.error("Failed to get Trainer data!", {
         description: queryError.message,
@@ -73,7 +73,7 @@ const useTrainer = (trainerId: string | undefined) => {
   }, [isQueryError, queryError]);
 
   // Effect for handling mutation errors
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMutationError && mutationError) {
       toast.error("Failed to update Trainer!", {
         description: mutationError.message,

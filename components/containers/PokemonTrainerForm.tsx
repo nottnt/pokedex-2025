@@ -1,7 +1,7 @@
 // app/page.tsx
 "use client";
 
-import React from "react";
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function PokemonTrainerForm() {
     updateTrainer(data);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (trainerId && trainerData) {
       form.reset(trainerData);
     }

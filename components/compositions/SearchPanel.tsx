@@ -1,4 +1,4 @@
-import React from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X, Loader2 } from "lucide-react";
@@ -9,10 +9,10 @@ interface SearchPanelProps {
 }
 
 export function SearchPanel({ onSubmit }: SearchPanelProps) {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [isSearching, setIsSearching] = React.useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await performSearch();
   };

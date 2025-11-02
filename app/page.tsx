@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import PokemonCard from "@/components/PokemonCard";
 import { getOfficialArtwork, getPokemonIdFromPokemonUrl } from "@/utils";
@@ -18,14 +18,14 @@ export default function Home() {
   const trainerId = session?.user?.trainer?._id as string;
   const { addPokemonToPokedex, setOfTrainerPokedex } =
     useTrainerPokedex(trainerId);
-  const [filteredPokemons, setFilteredPokemons] = React.useState<
+  const [filteredPokemons, setFilteredPokemons] = useState<
     NamedAPIResource[]
   >([]);
-  const [displayPokemons, setDisplayPokemons] = React.useState<
+  const [displayPokemons, setDisplayPokemons] = useState<
     NamedAPIResource[]
   >([]);
-  const [page, setPage] = React.useState(1);
-  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) initPokemons();
@@ -64,20 +64,20 @@ export default function Home() {
     setFilteredPokemons(allPokemons);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
     }
   }, [allPokemons]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Only handle next page if it's not the initial page (page 1)
     if (page > 1) {
       handleNextPage(page);
     }
   }, [page]);
 
-  const hasNextPage = React.useMemo(() => {
+  const hasNextPage = useMemo(() => {
     return displayPokemons.length < filteredPokemons.length;
   }, [filteredPokemons, displayPokemons]);
 
