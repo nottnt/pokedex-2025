@@ -5,9 +5,10 @@ A modern, full-stack Pokédex application built with Next.js 15, featuring user 
 ## 🎬 Showcase
 
 <!-- Add your demo GIF here -->
-![App Demo](./public/demo.gif)
+![App Demo](https://github.com/user-attachments/assets/cf3ac9dc-1f49-4099-b926-264c2f36404b)
 
 ### Key Features in Action
+
 
 <!-- Add feature-specific GIFs or screenshots here -->
 
