@@ -2,6 +2,22 @@
 
 A modern, full-stack Pokédex application built with Next.js 15, featuring user authentication, trainer profiles, and personal Pokémon collections.
 
+## 🎬 Showcase
+
+<!-- Add your demo GIF here -->
+![App Demo](./public/demo.gif)
+
+### Key Features in Action
+
+<!-- Add feature-specific GIFs or screenshots here -->
+
+| Feature | Preview |
+|---------|---------|
+| Authentication Flow | ![Auth Demo](./public/auth-demo.gif) |
+| Pokémon Search & Filter | ![Search Demo](./public/search-demo.gif) |
+| Personal Pokédx Management | ![Pokedex Demo](./public/pokedex-demo.gif) |
+| Trainer Profile | ![Trainer Demo](./public/trainer-demo.gif) |
+
 ## Features
 
 ### 🔐 User Authentication
@@ -60,6 +76,7 @@ A modern, full-stack Pokédex application built with Next.js 15, featuring user 
 
 ### Prerequisites
 - Node.js 18+
+- pnpm (recommended package manager)
 - MongoDB database (local or cloud)
 - Email service credentials (Resend)
 
@@ -73,7 +90,7 @@ cd pokedex-2025
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Set up environment variables:
@@ -92,17 +109,17 @@ RESEND_API_KEY=your_resend_api_key
 
 4. Start the development server:
 ```bash
-npm run dev
+pnpm dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build the application for production
-- `npm run start` - Start the production server
-- `npm run lint` - Run ESLint for code linting
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Build the application for production
+- `pnpm start` - Start the production server
+- `pnpm lint` - Run ESLint for code linting
 
 ## Project Structure
 
