@@ -12,10 +12,11 @@ A modern, full-stack Pokédex application built with Next.js 15, featuring user 
 
 <!-- Add feature-specific GIFs or screenshots here -->
 
+
 | Feature | Preview |
 |---------|---------|
-| Authentication Flow | ![Auth Demo](./public/auth-demo.gif) |
-| Pokémon Search & Filter | ![Search Demo](./public/search-demo.gif) |
+| Authentication Flow | ![Auth Demo](https://github.com/user-attachments/assets/222901a1-509d-4a71-87af-4582d104b0cf) |
+| Pokémon Search & Filter | ![Search Demo](https://github.com/user-attachments/assets/dda58529-b6fe-4c3d-a712-b253908abd10) |
 | Personal Pokédx Management | ![Pokedex Demo](./public/pokedex-demo.gif) |
 | Trainer Profile | ![Trainer Demo](./public/trainer-demo.gif) |
 
