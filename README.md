@@ -2,6 +2,26 @@
 
 A modern, full-stack Pokédex application built with Next.js 15, featuring user authentication, trainer profiles, and personal Pokémon collections.
 
+## 🎬 Showcase
+
+<!-- Add your demo GIF here -->
+![App Demo](https://github.com/user-attachments/assets/cf3ac9dc-1f49-4099-b926-264c2f36404b)
+
+
+
+### Key Features in Action
+
+
+<!-- Add feature-specific GIFs or screenshots here -->
+
+
+| Feature | Preview |
+|---------|---------|
+| Authentication Flow | ![Auth Demo](https://github.com/user-attachments/assets/222901a1-509d-4a71-87af-4582d104b0cf) |
+| Pokémon Search & Filter | ![Search Demo](https://github.com/user-attachments/assets/dda58529-b6fe-4c3d-a712-b253908abd10) |
+| Personal Pokédex Management | ![Pokedex Demo](https://github.com/user-attachments/assets/d190dab1-ab55-44bf-bdba-6a60e5d90a3d) |
+| Trainer Profile | ![Trainer Demo](https://github.com/user-attachments/assets/37492381-2f05-4c8c-b436-12a262fb43fa) |
+
 ## Features
 
 ### 🔐 User Authentication
@@ -60,6 +80,7 @@ A modern, full-stack Pokédex application built with Next.js 15, featuring user 
 
 ### Prerequisites
 - Node.js 18+
+- pnpm (recommended package manager)
 - MongoDB database (local or cloud)
 - Email service credentials (Resend)
 
@@ -73,7 +94,7 @@ cd pokedex-2025
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Set up environment variables:
@@ -92,17 +113,17 @@ RESEND_API_KEY=your_resend_api_key
 
 4. Start the development server:
 ```bash
-npm run dev
+pnpm dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build the application for production
-- `npm run start` - Start the production server
-- `npm run lint` - Run ESLint for code linting
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Build the application for production
+- `pnpm start` - Start the production server
+- `pnpm lint` - Run ESLint for code linting
 
 ## Project Structure
 
