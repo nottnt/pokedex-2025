@@ -49,7 +49,7 @@ export default function PokemonCard({
 }: PokemonCardProps) {
   const { data: session } = useSession();
   const trainerId = session?.user?.trainer?._id as string;
-  const { data: pokemonForm, isLoading } = usePokemonForm(id);
+  const { data: pokemonForm } = usePokemonForm(id);
 
   return (
     <Link href={`/pokemon/${id}`} className="block">

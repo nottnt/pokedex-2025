@@ -25,13 +25,14 @@ import {
 import { AlertTriangle, MailWarning } from "lucide-react";
 import { toast } from "sonner"; // For notifications after dialog interaction
 import { RequestVerificationEmailForm } from "@/components/auth/RequestVerificationEmailForm"; // Import reusable form
+import LoadingPage from "@/components/LoadingPage";
 
 function VerificationFailedContent() {
   const searchParams = useSearchParams();
   const reason = searchParams.get("reason");
   const [isResendDialogOpen, setIsResendDialogOpen] = React.useState(false);
 
-  const handleResendSuccess = (message: string, email: string) => {
+  const handleResendSuccess = (message: string) => {
     toast.success("Verification Email Sent!", { description: message });
     setIsResendDialogOpen(false); // Close dialog on success
   };
@@ -139,21 +140,7 @@ function VerificationFailedContent() {
 
 export default function VerificationFailedPage() {
   return (
-    <React.Suspense fallback={
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md shadow-lg">
-          <CardHeader className="text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted/10 mb-4">
-              <AlertTriangle className="h-5 w-5 text-muted-foreground animate-pulse" />
-            </div>
-            <CardTitle className="text-2xl font-bold">Loading...</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Please wait while we load the page.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    }>
+    <React.Suspense fallback={<LoadingPage />}>
       <VerificationFailedContent />
     </React.Suspense>
   );

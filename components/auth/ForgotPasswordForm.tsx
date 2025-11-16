@@ -17,13 +17,12 @@ import { useMutation } from "@tanstack/react-query";
 import { forgotPasswordSchema, ForgotPasswordInput } from "@/lib/validation/auth";
 
 interface ForgotPasswordFormProps {
-  onBackToLogin: () => void;
+  onBackToLogin?: () => void;
   onResetEmailSent: (email: string) => void;
   initialEmail?: string;
 }
 
 export function ForgotPasswordForm({
-  onBackToLogin,
   onResetEmailSent,
   initialEmail,
 }: ForgotPasswordFormProps) {

@@ -23,8 +23,7 @@ import useTrainer from "@/hooks/useTrainer";
 export default function PokemonTrainerForm() {
   const params = useParams();
   const trainerId = params.id as string;
-  const { trainerData, isLoading, isError, updateTrainer, isUpdating } =
-    useTrainer(trainerId);
+  const { trainerData, updateTrainer, isUpdating } = useTrainer(trainerId);
 
   const form = useForm<TrainerFormData>({
     resolver: zodResolver(trainerSchema),
@@ -43,7 +42,7 @@ export default function PokemonTrainerForm() {
     if (trainerId && trainerData) {
       form.reset(trainerData);
     }
-  }, [trainerData, trainerId]);
+  }, [trainerData, trainerId, form]);
 
   return (
     <main className="p-6 max-w-md mx-auto">

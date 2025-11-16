@@ -5,6 +5,7 @@ import { fetchPokemonByName } from "@/lib/fetchPokemons";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 import PokemonDetailView from "@/components/PokemonDetailView";
+import LoadingPage from "@/components/LoadingPage";
 
 interface PokemonDetailPageProps {
   params: Promise<{
@@ -17,7 +18,11 @@ export default function PokemonDetailPage({ params }: PokemonDetailPageProps) {
   const pokemonId = parseInt(id);
 
   // Fetch detailed pokemon data
-  const { data: pokemon, isLoading: isPokemonLoading, error: pokemonError } = useQuery({
+  const {
+    data: pokemon,
+    isLoading: isPokemonLoading,
+    error: pokemonError,
+  } = useQuery({
     queryKey: ["pokemon", pokemonId],
     queryFn: () => fetchPokemonByName(pokemonId.toString()),
     enabled: !!pokemonId,
@@ -34,13 +39,7 @@ export default function PokemonDetailPage({ params }: PokemonDetailPageProps) {
   }
 
   if (isPokemonLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (!pokemon) {

@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { Pokemon } from "pokenode-ts";
 
 import { Button } from "@/components/ui/button";
-import useTrainerPokedex from "@/hooks/useTrainerPokedex";
+import useTrainerPokedex, { type Pokemon as TrainerPokedex } from "@/hooks/useTrainerPokedex";
 
 // Import Pokemon detail card components
 import PokemonImageCard from "@/components/pokemon-detail/PokemonImageCard";
@@ -32,7 +32,7 @@ export default function PokemonDetailView({ pokemon }: PokemonDetailViewProps) {
   } = useTrainerPokedex(trainerId);
 
   const isInPokedex = trainerPokedexData?.some(
-    (p) => p.pokemonId === pokemon.id
+    (p: TrainerPokedex) => p.pokemonId === pokemon.id
   );
 
   const handleTogglePokedex = () => {

@@ -21,7 +21,7 @@ import { AuthDialog } from "./AuthDialog";
 import useTrainer from "@/hooks/useTrainer";
 
 export function Navbar() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
   const router = useRouter();
   const { trainerData } = useTrainer(session?.user?.trainer?._id as string);

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,14 +19,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { resetPasswordSchema, ResetPasswordInput } from "@/lib/validation/auth";
+import LoadingPage from "@/components/LoadingPage";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const [isResetSuccessful, setIsResetSuccessful] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isResetSuccessful, setIsResetSuccessful] = useState(false);
 
   // Validate token on page load
   const { isLoading: isValidatingToken, error: tokenError } = useQuery({
@@ -36,7 +37,9 @@ export default function ResetPasswordPage() {
 
       const res = await fetch(`/api/auth/reset-password?token=${token}`);
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: "Invalid token" }));
+        const errorData = await res
+          .json()
+          .catch(() => ({ message: "Invalid token" }));
         throw new Error(errorData.message);
       }
       return res.json();
@@ -68,7 +71,9 @@ export default function ResetPasswordPage() {
         const errorData = await res
           .json()
           .catch(() => ({ message: "An unknown error occurred" }));
-        throw new Error(errorData.message || `Request failed with status ${res.status}`);
+        throw new Error(
+          errorData.message || `Request failed with status ${res.status}`
+        );
       }
 
       return res.json();
@@ -96,7 +101,9 @@ export default function ResetPasswordPage() {
         <div className="max-w-md w-full space-y-4 p-6">
           <div className="text-center">
             <h1 className="text-2xl font-bold">Validating Reset Link...</h1>
-            <p className="text-muted-foreground">Please wait while we verify your reset token.</p>
+            <p className="text-muted-foreground">
+              Please wait while we verify your reset token.
+            </p>
           </div>
         </div>
       </div>
@@ -109,12 +116,16 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="max-w-md w-full space-y-4 p-6">
           <div className="text-center space-y-4">
-            <h1 className="text-2xl font-bold text-destructive">Invalid Reset Link</h1>
+            <h1 className="text-2xl font-bold text-destructive">
+              Invalid Reset Link
+            </h1>
             <p className="text-muted-foreground">
-              {tokenError?.message || "The password reset link is invalid or has expired."}
+              {tokenError?.message ||
+                "The password reset link is invalid or has expired."}
             </p>
             <p className="text-sm text-muted-foreground">
-              Please request a new password reset link if you still need to reset your password.
+              Please request a new password reset link if you still need to
+              reset your password.
             </p>
             <Link href="/">
               <Button className="w-full">Back to Login</Button>
@@ -131,9 +142,12 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="max-w-md w-full space-y-4 p-6">
           <div className="text-center space-y-4">
-            <h1 className="text-2xl font-bold text-green-600">Password Reset Successful!</h1>
+            <h1 className="text-2xl font-bold text-green-600">
+              Password Reset Successful!
+            </h1>
             <p className="text-muted-foreground">
-              Your password has been reset successfully. You can now sign in with your new password.
+              Your password has been reset successfully. You can now sign in
+              with your new password.
             </p>
             <Link href="/">
               <Button className="w-full">Go to Login</Button>
@@ -216,7 +230,9 @@ export default function ResetPasswordPage() {
 
             <div className="flex flex-col gap-2 pt-2">
               <Button type="submit" disabled={resetPasswordMutation.isPending}>
-                {resetPasswordMutation.isPending ? "Resetting..." : "Reset Password"}
+                {resetPasswordMutation.isPending
+                  ? "Resetting..."
+                  : "Reset Password"}
               </Button>
               <Link href="/">
                 <Button
@@ -233,5 +249,13 @@ export default function ResetPasswordPage() {
         </Form>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }
