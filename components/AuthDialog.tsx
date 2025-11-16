@@ -41,10 +41,10 @@ export function AuthDialog() {
   // This handler is called by RequestVerificationEmailForm *within AuthDialog*
   const handleRequestVerificationSuccessInDialog = (
     message: string,
-    email: string
+    email?: string
   ) => {
     toast.success("Verification Email Sent", { description: message });
-    setInitialEmail(email); // Keep email for potential login pre-fill
+    setInitialEmail(email!); // Keep email for potential login pre-fill
     setAuthMode(AuthMode.LOGIN); // Switch to login mode
   };
 

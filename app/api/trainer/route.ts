@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(updatedOrCreatedTrainer, { status: 200 });
-  } catch (err: any) {
+  } catch (err) {
     if (err instanceof ZodError) {
       return NextResponse.json(
         { message: "Invalid form data", errors: err.errors },
@@ -63,7 +63,7 @@ export async function GET() {
     await connectToDB();
     const trainers = await Trainer.find({}).populate("userId");
     return NextResponse.json(trainers);
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error fetching trainers:", err);
     return NextResponse.json(
       { message: "An internal server error occurred." },

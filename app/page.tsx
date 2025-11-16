@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -13,11 +13,12 @@ import { DATA_PER_PAGE } from "@/constants";
 import { SearchPanel } from "@/components/compositions/SearchPanel";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Loader2 } from "lucide-react";
+import LoadingPage from "@/components/LoadingPage";
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
   const { data: allPokemons = [], isLoading } = usePokemons();
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
   const trainerId = session?.user?.trainer?._id as string;
   const { addPokemonToPokedex, setOfTrainerPokedex } =
     useTrainerPokedex(trainerId);
@@ -51,27 +52,30 @@ export default function Home() {
     return slicedPokemons;
   };
 
-  const handleNextPage = (page: number) => {
-    const nextPokemons = slicePokemons(
-      filteredPokemons,
-      (page - 1) * DATA_PER_PAGE,
-      page * DATA_PER_PAGE
-    );
+  const handleNextPage = useCallback(
+    (page: number) => {
+      const nextPokemons = slicePokemons(
+        filteredPokemons,
+        (page - 1) * DATA_PER_PAGE,
+        page * DATA_PER_PAGE
+      );
 
-    setDisplayPokemons((prev) => [...prev, ...nextPokemons]);
-  };
+      setDisplayPokemons((prev) => [...prev, ...nextPokemons]);
+    },
+    [filteredPokemons, setDisplayPokemons]
+  );
 
-  const initPokemons = () => {
+  const initPokemons = useCallback(() => {
     const initialPokemons = slicePokemons(allPokemons);
     setDisplayPokemons(initialPokemons);
     setFilteredPokemons(allPokemons);
-  };
+  }, [allPokemons, setDisplayPokemons, setFilteredPokemons]);
 
   useEffect(() => {
     if (allPokemons.length > 0) {
       initPokemons();
     }
-  }, [allPokemons]);
+  }, [allPokemons, initPokemons]);
 
   // Check for email verification success
   useEffect(() => {
@@ -96,7 +100,7 @@ export default function Home() {
     if (page > 1) {
       handleNextPage(page);
     }
-  }, [page]);
+  }, [page, handleNextPage]);
 
   const hasNextPage = useMemo(() => {
     return displayPokemons.length < filteredPokemons.length;
@@ -107,7 +111,7 @@ export default function Home() {
       <SearchPanel onSubmit={handleSearch} />
 
       {isLoading ? (
-        <div className="text-center">Loading...</div>
+        <LoadingPage />
       ) : (
         <>
           {/* Else show normal Pokémon list */}
@@ -169,5 +173,19 @@ export default function Home() {
         </>
       )}
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense
+      fallback={
+        <main className="p-8">
+          <LoadingPage />
+        </main>
+      }
+    >
+      <HomeContent />
+    </Suspense>
   );
 }

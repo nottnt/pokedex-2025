@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Trainer from "@/lib/models/Trainer";
+import { Error } from "mongoose";
 
 export async function GET(
   req: NextRequest,
@@ -21,9 +22,9 @@ export async function GET(
     }
 
     return NextResponse.json(trainer);
-  } catch (err: any) {
+  } catch (err) {
     // This catches errors like an invalid MongoDB ObjectId format
-    if (err.kind === "ObjectId") {
+    if (err instanceof Error.CastError && err.kind === "ObjectId") {
       return NextResponse.json(
         { message: `Invalid Trainer ID format: "${id}"` },
         { status: 400 }

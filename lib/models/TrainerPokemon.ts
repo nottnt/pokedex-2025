@@ -4,7 +4,6 @@ import mongoose, {
   models,
   Document,
   Model,
-  Types,
 } from "mongoose";
 import { TrainerPokemonData } from "../validation/trainerPokemon";
 

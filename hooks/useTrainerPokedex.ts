@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
-interface Pokemon {
+export interface Pokemon {
   pokemonId: number;
   pokemonName: string;
 }

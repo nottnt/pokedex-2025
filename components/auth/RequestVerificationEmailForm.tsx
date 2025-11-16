@@ -12,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +28,7 @@ interface ResendApiResponse {
 
 interface RequestVerificationEmailFormProps {
   initialEmail?: string;
-  onSuccess?: (message: string, email: string) => void; // Callback for parent on success
+  onSuccess?: (message: string, email?: string) => void; // Callback for parent on success
   // Optional: if you want a dedicated cancel button handled by parent in dialog context
   // onCancel?: () => void;
   submitButtonText?: string;
@@ -85,7 +85,7 @@ export function RequestVerificationEmailForm({
       setApiMessage({ type: "success", text: successText });
       form.reset({ email: variables.email }); // Keep email in form or clear: form.reset();
       if (onSuccess) {
-        onSuccess(successText, variables.email);
+        onSuccess(successText);
       }
     },
     onError: (error: Error) => {

@@ -56,7 +56,7 @@ const useTrainer = (trainerId: string | undefined) => {
 
       queryClient.invalidateQueries({ queryKey: ["trainer"] });
     },
-    onError: (err: any) => {
+    onError: (err) => {
       toast.error("Update Failed!", {
         description: err.message,
       });

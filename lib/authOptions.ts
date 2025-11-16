@@ -9,7 +9,6 @@ import User from "@/lib/models/User";
 import Trainer from "@/lib/models/Trainer";
 import { AuthOptions } from "next-auth";
 import { AuthProvider } from "@/types/common";
-import mongoose from "mongoose";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -98,9 +97,9 @@ export const authOptions: AuthOptions = {
             // Add any other user properties you want in the token/session
             trainer: user.trainer,
           };
-        } catch (error: any) {
+        } catch (error) {
           // Log the error that occurred in the try block OR the error thrown by us (e.g., Email not verified)
-          console.error(`Authorize error: ${error.message}`);
+          console.error(`Authorize error: ${error}`);
           // Re-throw the error so NextAuth can handle it (or it bubbles up to signIn call)
           throw error; // Or throw new Error(error.message) if you want to ensure it's an Error instance
         }
