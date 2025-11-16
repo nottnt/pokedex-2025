@@ -21,7 +21,7 @@ export async function GET(
     }
 
     return NextResponse.json(trainer);
-  } catch (err: any) {
+  } catch (err) {
     // This catches errors like an invalid MongoDB ObjectId format
     if (err.kind === "ObjectId") {
       return NextResponse.json(

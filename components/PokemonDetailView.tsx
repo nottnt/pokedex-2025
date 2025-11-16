@@ -32,7 +32,7 @@ export default function PokemonDetailView({ pokemon }: PokemonDetailViewProps) {
   } = useTrainerPokedex(trainerId);
 
   const isInPokedex = trainerPokedexData?.some(
-    (p: any) => p.pokemonId === pokemon.id
+    (p) => p.pokemonId === pokemon.id
   );
 
   const handleTogglePokedex = () => {

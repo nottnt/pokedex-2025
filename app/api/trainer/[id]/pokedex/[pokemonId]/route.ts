@@ -28,7 +28,7 @@ export async function DELETE(
     return NextResponse.json({
       message: `Successfully deleted pokemon ${pokemonId} for trainer ${trainerId}.`,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error deleting specific trainer pokemon:", err);
     return NextResponse.json(
       { message: "An internal server error occurred." },

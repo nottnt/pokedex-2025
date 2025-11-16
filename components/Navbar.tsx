@@ -55,7 +55,7 @@ export function Navbar() {
                 <AvatarFallback>
                   {session.user?.email
                     ?.split(" ")
-                    .map((n: any) => n[0])
+                    .map((n: string) => n[0])
                     .join("")
                     .toUpperCase() ?? <User />}
                 </AvatarFallback>

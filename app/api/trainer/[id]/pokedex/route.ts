@@ -31,7 +31,7 @@ export async function GET(
     }
 
     return NextResponse.json(trainerPokemon);
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error fetching trainer pokemon:", err);
     return NextResponse.json(
       { message: "An internal server error occurred." },
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(createdTrainerPokemon, { status: 200 });
-  } catch (err: any) {
+  } catch (err) {
     if (err instanceof ZodError) {
       return NextResponse.json(
         { message: "Invalid form data", errors: err.errors },
