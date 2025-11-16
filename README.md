@@ -27,6 +27,7 @@ A modern, full-stack Pokédex application built with Next.js 15, featuring user 
 ### 🔐 User Authentication
 - Email-based signup and login system
 - Email verification through Resend service
+- Password reset/forgot password functionality
 - Secure password hashing with bcryptjs
 - Protected routes and user sessions with NextAuth
 
@@ -146,7 +147,10 @@ pokedex-2025/
 1. Users can sign up with email and password
 2. Email verification is sent via Resend
 3. After verification, users can log in
-4. Protected routes ensure authenticated access
+4. **Forgot Password**: Users can request password reset via email
+5. Password reset link is sent through Resend service
+6. Users can set a new password using the secure reset link
+7. Protected routes ensure authenticated access
 
 ### Pokémon Management
 1. Browse Pokémon from the PokéAPI
